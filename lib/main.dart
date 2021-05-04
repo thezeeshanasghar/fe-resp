@@ -9,7 +9,7 @@ void main() {
     initialRoute: '/',
     routes: {
       '/addPatient': (context) => AddPatient(),
-      '/Expense': (context) => Expense(),
+      '/Expense': (context) => ExpensesList(),
       '/NewExpense': (context) => NewExpense(),
       '/PatientList': (context) => PatientList(),
       '/': (context) => Home(),
