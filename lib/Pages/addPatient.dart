@@ -1,9 +1,8 @@
-import 'dart:html';
 
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:baby_receptionist/receptionist/DoctorPrefer.dart';
+import 'package:baby_receptionist/Pages/DoctorPrefer.dart';
 
 
 import 'package:flutter/foundation.dart';

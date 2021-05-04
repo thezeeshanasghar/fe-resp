@@ -58,6 +58,13 @@ class HomeDrawer extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.pushNamed(context, '/NewExpense');
+                }),
+            ListTile(
+                leading: Icon(Icons.add_to_photos_outlined ),
+                title: Text('Patient List'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/PatientList');
                 })
           ],
         ),

@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-class NewExpense extends StatefulWidget {
+class PatientList extends StatefulWidget {
   @override
-  _NewExpenseState createState() => _NewExpenseState();
+  _PatientListState createState() => _PatientListState();
 }
 
-class _NewExpenseState extends State<NewExpense> {
+class _PatientListState extends State<PatientList> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text("New Expense"),
+        title: Text("Patient List"),
         centerTitle: false,
         backgroundColor: Colors.grey,
         elevation: 0.0,
       ),
-      body: NewExpenseForm(),
+      body: PatientListForm(),
     );
   }
 }
 
-class NewExpenseForm extends StatefulWidget {
+class PatientListForm extends StatefulWidget {
   @override
-  _NewExpenseFormState createState() => _NewExpenseFormState();
+  _PatientListFormState createState() => _PatientListFormState();
 
 }
 
-class _NewExpenseFormState extends State<NewExpenseForm> {
+class _PatientListFormState extends State<PatientListForm> {
 
-  final NewExpenseFormKey = GlobalKey<FormState>();
+  final PatientListFormKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -57,13 +57,12 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
                 minHeight: viewportConstraints.minHeight,
               ),
               child: Form(
-                key: NewExpenseFormKey,
+                key: PatientListFormKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Column(
                       children: [
-
 
                       ],
 
