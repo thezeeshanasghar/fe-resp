@@ -1,17 +1,24 @@
+import 'package:baby_receptionist/Pages/LoginScreen.dart';
+import 'package:baby_receptionist/Pages/NewInvoice.dart';
+import 'package:baby_receptionist/Pages/Refund.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_receptionist/Pages/Home.dart';
-import 'package:baby_receptionist/Pages/addPatient.dart';
-import 'package:baby_receptionist/Pages/Expense.dart';
+import 'package:baby_receptionist/Pages/AddPatient.dart';
+import 'package:baby_receptionist/Pages/ExpenseList.dart';
 import 'package:baby_receptionist/Pages/NewExpense.dart';
 import 'package:baby_receptionist/Pages//PatientList.dart';
+
 void main() {
   runApp(MaterialApp(
     initialRoute: '/',
     routes: {
-      '/addPatient': (context) => AddPatient(),
-      '/Expense': (context) => ExpensesList(),
+      '/AddPatient': (context) => AddPatient(),
+      '/ExpenseList': (context) => ExpenseList(),
       '/NewExpense': (context) => NewExpense(),
       '/PatientList': (context) => PatientList(),
+      '/NewInvoice': (context) => NewInvoice(),
+      '/Refund': (context) => Refund(),
+      '/LoginScreen': (context) => LoginScreen(),
       '/': (context) => Home(),
     },
   ));

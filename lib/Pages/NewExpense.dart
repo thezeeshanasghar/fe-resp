@@ -1,3 +1,4 @@
+import 'package:baby_receptionist/Design/Color.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,48 +9,21 @@ class NewExpense extends StatefulWidget {
 }
 
 class _NewExpenseState extends State<NewExpense> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text("New Expense"),
-        centerTitle: false,
-        backgroundColor: Colors.grey,
-        elevation: 0.0,
-      ),
-      body: NewExpenseForm(),
-    );
-  }
-}
-
-class NewExpenseForm extends StatefulWidget {
-  @override
-  _NewExpenseFormState createState() => _NewExpenseFormState();
-
-}
-
-class _NewExpenseFormState extends State<NewExpenseForm> {
-
-  final NewExpenseFormKey = GlobalKey<FormState>();
-  String FinalBill;
-  String CashPayment;
-  String EmployeeOrVender;
+  final NewExpenseKey = GlobalKey<FormState>();
+  String FinalBill = 'Select Final Bill';
+  String CashPayment = 'Payment Option';
+  String EmployeeOrVendor='Employee or Vendor';
   String VoucherNumber;
-  String ExpenseCategory;
-  String VenderName;
+  String ExpenseCategory='Choose Expense Category';
+  String VendorName;
   String EmployeeName;
   String TotalBill;
   String TransactionDetails;
 
-
   @override
   void initState() {
     super.initState();
-
   }
-
 
   @override
   void dispose() {
@@ -58,137 +32,114 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.minHeight,
-              ),
-              child: Form(
-                key: NewExpenseFormKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Column(
-                      children: [
+    return Scaffold(
+      backgroundColor: Shade.globalBackgroundColor,
+      body: DefaultTextStyle(
+        style: Theme.of(context).textTheme.bodyText2,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.minHeight,
+                ),
+                child: Form(
+                  key: NewExpenseKey,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
                         widgetFinalBill(),
                         widgetCashPayment(),
-                        widgetEmployeeOrVender(),
+                        widgetEmployeeOrVendor(),
                         widgetVoucherNumber(),
                         widgetExpenseCategory(),
                         widgetEmployeeName(),
                         widgetTotalBill(),
                         widgetTransactionDetails(),
-                        widgetSubmit(),
+                        widgetSubmit()
                       ],
-
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
+
   Widget widgetFinalBill() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: DropDownFormField(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(color: Colors.grey)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
             value: FinalBill,
-            titleText: 'Final Bill',
-            hintText: 'Final Bill',
-            onSaved: (value) {
+            elevation: 16,
+            onChanged: (String newValue) {
               setState(() {
-                FinalBill = value;
+                FinalBill = newValue;
               });
             },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                FinalBill = value;
-              });
-            },
-            dataSource: [
-              {
-                "display": "F# 1",
-                "value": "F# 1",
-              },
-              {
-                "display": "F# 2",
-                "value": "F# 2",
-              },
-              {
-                "display": "F# 3",
-                "value": "F# 3",
-              },
-            ],
-            textField: 'display',
-            valueField: 'value',
+            items: <String>[
+              'Select Final Bill',
+              'Option 1',
+              'Option 2',
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
         ),
-      ],
+      ),
     );
   }
+
   Widget widgetCashPayment() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: DropDownFormField(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(color: Colors.grey)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
             value: CashPayment,
-            titleText: 'Payment',
-            hintText: 'Payment',
-            onSaved: (value) {
+            elevation: 16,
+            onChanged: (String newValue) {
               setState(() {
-                CashPayment = value;
+                CashPayment = newValue;
               });
             },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                CashPayment = value;
-              });
-            },
-            dataSource: [
-              {
-                "display": "Cash",
-                "value": "Cash",
-              },
-              {
-                "display": "Credit Card",
-                "value": "Credit_Card",
-              },
-              {
-                "display": "Bank Transfer",
-                "value": "Bank_Transfer",
-              },
-            ],
-            textField: 'display',
-            valueField: 'value',
+            items: <String>[
+              'Payment Option',
+              'Cash',
+              'Credit Card',
+              'Bank Transfer',
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
         ),
-      ],
+      ),
     );
   }
+
   Widget widgetVoucherNumber() {
     return Column(
       children: [
@@ -198,7 +149,7 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
             maxLength: 13,
             autofocus: false,
             decoration: InputDecoration(
-                icon: Icon(Icons.credit_card),
+                prefixIcon: Icon(Icons.credit_card),
                 border: OutlineInputBorder(),
                 labelText: 'Voucher Number'),
             validator: (String value) {
@@ -216,115 +167,79 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
       ],
     );
   }
-  Widget widgetEmployeeOrVender() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: DropDownFormField(
-            value: EmployeeOrVender,
-            titleText: 'Select Employee',
-            hintText: 'Employee',
-            onSaved: (value) {
-              setState(() {
-                EmployeeOrVender = value;
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                EmployeeOrVender = value;
-              });
-            },
-            dataSource: [
-              {
-                "display": "Employee",
-                "value": "Employee",
-              },
-              {
-                "display": "Vender",
-                "value": "Vender",
-              },
 
-            ],
-            textField: 'display',
-            valueField: 'value',
+  Widget widgetEmployeeOrVendor() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(color: Colors.grey)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
+            value: EmployeeOrVendor,
+            elevation: 16,
+            onChanged: (String newValue) {
+              setState(() {
+                EmployeeOrVendor = newValue;
+              });
+            },
+            items: <String>[
+              'Employee or Vendor',
+              'Employee',
+              'Vendor',
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
         ),
-      ],
+      ),
     );
   }
+
   Widget widgetExpenseCategory() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: DropDownFormField(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(color: Colors.grey)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
             value: ExpenseCategory,
-            titleText: 'ExpenseCategory',
-            hintText: 'ExpenseCategory',
-            onSaved: (value) {
+            elevation: 16,
+            onChanged: (String newValue) {
               setState(() {
-                ExpenseCategory = value;
+                ExpenseCategory = newValue;
               });
             },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                ExpenseCategory = value;
-              });
-            },
-            dataSource: [
-              {
-                "display": "IT",
-                "value": "IT",
-              },
-              {
-                "display": "Utlity Bills",
-                "value": "Utlity Bills",
-              },
-              {
-                "display": "Medical",
-                "value": "Medical",
-              },
-              {
-                "display": "Electrical",
-                "value": "Electrical",
-              },
-              {
-                "display": "Plumbing",
-                "value": "Plumbing",
-              },
-              {
-                "display": "Cleaning",
-                "value": "Cleaning",
-              },
-              {
-                "display": "Kitchen",
-                "value": "Kitchen",
-              },
-
-
-            ],
-            textField: 'display',
-            valueField: 'value',
+            items: <String>[
+              'Choose Expense Category',
+              'Utility Bills',
+              'Medical',
+              'Electrical',
+              'Plumbing',
+              'Cleaning',
+              'Kitchen'
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
         ),
-      ],
+      ),
     );
   }
+
   Widget widgetEmployeeName() {
     return Column(
       children: [
@@ -334,7 +249,7 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Employee Name'),
             validator: (String value) {
@@ -351,7 +266,8 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
       ],
     );
   }
-  Widget widgetVenderName() {
+
+  Widget widgetVendorName() {
     return Column(
       children: [
         Padding(
@@ -362,7 +278,7 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
             decoration: InputDecoration(
                 icon: Icon(Icons.person),
                 border: OutlineInputBorder(),
-                labelText: 'Vender Name'),
+                labelText: 'Vendor Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -370,13 +286,14 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
               return null;
             },
             onSaved: (String value) {
-              VenderName = value;
+              VendorName = value;
             },
           ),
         ),
       ],
     );
   }
+
   Widget widgetTotalBill() {
     return Column(
       children: [
@@ -386,7 +303,7 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
             maxLength: 13,
             autofocus: false,
             decoration: InputDecoration(
-                icon: Icon(Icons.credit_card),
+                prefixIcon: Icon(Icons.credit_card),
                 border: OutlineInputBorder(),
                 labelText: 'Total Bill '),
             validator: (String value) {
@@ -404,6 +321,7 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
       ],
     );
   }
+
   Widget widgetTransactionDetails() {
     return Column(
       children: [
@@ -412,12 +330,11 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
-            minLines: 6,
             keyboardType: TextInputType.multiline,
             textAlignVertical: TextAlignVertical.top,
             maxLines: null,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.transform),
                 border: OutlineInputBorder(),
                 labelText: 'Transaction Details'),
             validator: (String value) {
@@ -439,27 +356,27 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
     return Column(
       children: [
         Align(
-          alignment: Alignment.bottomRight,
+          alignment: Alignment.center,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: EdgeInsets.fromLTRB(8, 10, 8, 10),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 90, vertical: 15),
-                textStyle: TextStyle(fontSize: 20),
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!NewExpenseFormKey.currentState.validate()) {
+                if (!NewExpenseKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content :
-                      Text('Error: Some input fields are not filled.')));
+                      content:
+                          Text('Error: Some input fields are not filled.')));
                   return;
                 }
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text('Successfull')));
-                NewExpenseFormKey.currentState.save();
-
+                NewExpenseKey.currentState.save();
               },
             ),
           ),

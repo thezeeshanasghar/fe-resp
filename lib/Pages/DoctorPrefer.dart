@@ -39,17 +39,26 @@ class _DoctorPreferFormState extends State<DoctorPreferForm> {
 
   String ValueChoose;
   String DoctorSpeciality;
-  List listitem = ["Cardiologist", "Ent Surgeon", "Urologist","Radiologist","Plastic Surgeon","Orthopedic Surgeon"];
+  List listitem = [
+    "Cardiologist",
+    "Ent Surgeon",
+    "Urologist",
+    "Radiologist",
+    "Plastic Surgeon",
+    "Orthopedic Surgeon"
+  ];
   String DoctorName;
-  List DoctorNamelist = ["Ahmed", "Basit", "Ali","Saad"];
+  List DoctorNamelist = ["Ahmed", "Basit", "Ali", "Saad"];
   int selectedRadioTile;
   int selectedRadio;
+
   @override
   void initState() {
     super.initState();
     selectedRadio = 0;
     selectedRadioTile = 0;
   }
+
   setSelectedRadioTile(int val) {
     setState(() {
       selectedRadioTile = val;
@@ -64,7 +73,10 @@ class _DoctorPreferFormState extends State<DoctorPreferForm> {
   @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
+      style: Theme
+          .of(context)
+          .textTheme
+          .bodyText2,
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints viewportConstraints) {
           return SingleChildScrollView(
@@ -96,6 +108,7 @@ class _DoctorPreferFormState extends State<DoctorPreferForm> {
       ),
     );
   }
+
   Widget widgetGender() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -151,6 +164,7 @@ class _DoctorPreferFormState extends State<DoctorPreferForm> {
       ],
     );
   }
+
   Widget widgetSelectDoctor() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -207,6 +221,7 @@ class _DoctorPreferFormState extends State<DoctorPreferForm> {
       ],
     );
   }
+
   Widget widgetSubmit() {
     return Column(
       children: [
@@ -229,7 +244,8 @@ class _DoctorPreferFormState extends State<DoctorPreferForm> {
                   return;
                 }
                 ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Doctor prefer successfully!')));
+                    .showSnackBar(
+                    SnackBar(content: Text('Doctor prefer successfully!')));
                 DoctorPreferFormKey.currentState.save();
               },
             ),

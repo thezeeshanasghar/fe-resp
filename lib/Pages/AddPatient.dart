@@ -1,59 +1,38 @@
-
+import 'package:baby_receptionist/Design/Dimens.dart';
+import 'package:baby_receptionist/Design/Color.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:baby_receptionist/Pages/DoctorPrefer.dart';
 
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 class AddPatient extends StatefulWidget {
   @override
   _AddPatientState createState() => _AddPatientState();
 }
 
 class _AddPatientState extends State<AddPatient> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text("Add Patient"),
-        centerTitle: false,
-        backgroundColor: Colors.grey,
-        elevation: 0.0,
-      ),
-      body: AddPatientForm(),
-    );
-  }
-}
-
-class AddPatientForm extends StatefulWidget {
-  @override
-  _AddPatientFormState createState() => _AddPatientFormState();
-
-
-
-}
-enum BestTutorSite { javatpoint, w3schools, tutorialandexample }
-class _AddPatientFormState extends State<AddPatientForm> {
-
   final adPatientFormKey = GlobalKey<FormState>();
   final DateOfBirthController = TextEditingController();
 
-   DateTime DateOfBirth;
-   String ValueChoose;
-   String Gender;
+  DateTime DateOfBirth;
+  String ValueChoose;
+  String Gender = 'Choose Gender';
   List listitem = ["Admitted", "Non Admitted"];
   int selectedRadioTile;
   int selectedRadio;
+  String PatientType;
+  String PatientCategory = 'Visitor';
+
   @override
   void initState() {
     super.initState();
     selectedRadio = 0;
     selectedRadioTile = 0;
   }
+
   setSelectedRadioTile(int val) {
     setState(() {
       selectedRadioTile = val;
@@ -67,22 +46,29 @@ class _AddPatientFormState extends State<AddPatientForm> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.minHeight,
-              ),
-              child: Form(
-                key: adPatientFormKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Column(
-                      children: [
+    return Scaffold(
+      backgroundColor: Shade.globalBackgroundColor,
+      body: DefaultTextStyle(
+        style: Theme.of(context).textTheme.bodyText2,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.minHeight,
+                ),
+                child: Form(
+                  key: adPatientFormKey,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                        Dimens.globalPaddingLeft,
+                        Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight,
+                        Dimens.globalPaddingBottom),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        widgetPatientCategory(),
                         widgetName(),
                         widgetFatherOrHusbandName(),
                         widgetDateOfBirth(),
@@ -92,7 +78,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                         widgetContactNumber(),
                         widgetAddress(),
                         widgetStatus(),
-                        widgetPanelNonPanel(),
+                        widgetPatientType(),
                         widgetPatientExternalID(),
                         widgetBloodGroup(),
                         widgetClinicSite(),
@@ -101,62 +87,119 @@ class _AddPatientFormState extends State<AddPatientForm> {
                         widgetReligion(),
                         widgetParentGuardian(),
                         widgetPaymentProfile(),
-                        widgetSubmit(),
+                        widgetSubmit()
                       ],
-
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
-  Widget widgetGender() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: DropDownFormField(
-            value: Gender,
-            titleText: 'Gender',
-            hintText: 'Select your Gender',
-            onSaved: (value) {
-              setState(() {
-                Gender = value;
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                Gender = value;
-              });
-            },
-            dataSource: [
-              {
-                "display": "Male",
-                "value": "Male",
-              },
-              {
-                "display": "Female",
-                "value": "Female",
-              },
-            ],
-            textField: 'display',
-            valueField: 'value',
-          ),
+
+  Widget widgetPatientCategory() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 15),
+      child: Card(
+        shape: BeveledRectangleBorder(
+            borderRadius: BorderRadius.circular(2.5),
+            side: BorderSide(color: Colors.grey, width: 0)),
+        color: Colors.grey[100],
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(5, 0, 5, 10),
+              child: Column(
+                children: <Widget>[
+                  Column(
+                    children: [
+                      ListTile(
+                        title: const Text(
+                          'Choose Patient Category',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: RadioListTile(
+                          title: const Text('Visitor'),
+                          value: "Visitor",
+                          groupValue: PatientCategory,
+                          onChanged: (String value) {
+                            setState(() {
+                              PatientCategory = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile(
+                          title: const Text('On Call'),
+                          value: "On Call",
+                          groupValue: PatientCategory,
+                          onChanged: (String value) {
+                            setState(() {
+                              PatientCategory = value;
+                            });
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
+
+  Widget widgetGender() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(color: Colors.grey)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: DropdownButton<String>(
+            isExpanded: true,
+            value: Gender,
+            elevation: 16,
+            underline: Container(
+              height: 0,
+              color: Colors.deepPurpleAccent,
+            ),
+            onChanged: (String newValue) {
+              setState(() {
+                Gender = newValue;
+              });
+            },
+            items: <String>[
+              'Choose Gender',
+              'Male',
+              'Female',
+              'Other',
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget widgetName() {
     return Column(
       children: [
@@ -166,7 +209,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Patient Name'),
           ),
@@ -174,6 +217,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetPlaceOFBirth() {
     return Column(
       children: [
@@ -183,7 +227,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Place of Birth'),
           ),
@@ -191,6 +235,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetFatherOrHusbandName() {
     return Column(
       children: [
@@ -200,7 +245,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Father or Husband Name'),
           ),
@@ -208,6 +253,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetDateOfBirth() {
     return Column(
       children: [
@@ -216,7 +262,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
           child: TextFormField(
             controller: DateOfBirthController,
             decoration: InputDecoration(
-              icon: Icon(Icons.date_range),
+              prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
               labelText: 'Date of Birth',
             ),
@@ -228,97 +274,108 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetAddress() {
     return Column(
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-              maxLength: 50,
-              autofocus: false,
-              decoration: InputDecoration(
-                  icon: Icon(Icons.home),
-                  border: OutlineInputBorder(),
-                  labelText: 'Address'),
-
-              ),
+            maxLength: 50,
+            autofocus: false,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.home),
+                border: OutlineInputBorder(),
+                labelText: 'Address'),
+          ),
         ),
       ],
     );
   }
+
   Widget widgetEmail() {
     return Column(
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-              autofocus: false,
-              maxLength: 40,
-              decoration: InputDecoration(
-                  icon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
-                  labelText: 'Email'),
-              ),
+            autofocus: false,
+            maxLength: 40,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.email),
+                border: OutlineInputBorder(),
+                labelText: 'Email'),
+          ),
         ),
       ],
     );
   }
+
   Widget widgetContactNumber() {
     return Column(
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-              maxLength: 11,
-              autofocus: false,
-              decoration: InputDecoration(
-                  icon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Contact Number'),
-              ),
+            maxLength: 11,
+            autofocus: false,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.phone),
+                border: OutlineInputBorder(),
+                labelText: 'Contact Number'),
+          ),
         ),
       ],
     );
   }
-  Widget widgetPanelNonPanel(){
-    return Column(
-     children:<Widget>[
-    Padding(
-    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
 
-    child: RadioListTile(
-        value: 1,
-        groupValue: selectedRadioTile,
-         selectedTileColor: Colors.grey[750],
-        title: Text("Panel"),
-        onChanged: (val) {
-          setSelectedRadioTile(val);
-        },
-        activeColor: Colors.grey[750],
-        selected: true,
+  Widget widgetPatientType() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(4, 0, 4, 20),
+      child: Card(
+        shape: BeveledRectangleBorder(
+            borderRadius: BorderRadius.circular(2.5),
+            side: BorderSide(color: Colors.grey, width: 1)),
+        color: Colors.grey[100],
+        child: Column(
+          children: [
+            Column(
+              children: <Widget>[
+                ListTile(
+                  title: const Text('Patient Type : '),
+                ),
+                ListTile(
+                  title: const Text('Panel'),
+                  leading: Radio(
+                    value: "Panel",
+                    groupValue: PatientType,
+                    onChanged: (String value) {
+                      setState(() {
+                        PatientType = value;
+                      });
+                    },
+                  ),
+                ),
+                ListTile(
+                  title: const Text('Non-Panel'),
+                  leading: Radio(
+                    value: "Non-Panel",
+                    groupValue: PatientType,
+                    onChanged: (String value) {
+                      setState(() {
+                        PatientType = value;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-       Padding(
-         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-         child: RadioListTile(
-           value: 2,
-           groupValue: selectedRadioTile,
-           selectedTileColor: Colors.grey[750],
-           title: Text("Non Panel"),
-
-           onChanged: (val) {
-             setSelectedRadioTile(val);
-           },
-           activeColor: Colors.grey[750],
-           selected: true,
-         ),
-       ),
-    ],
     );
-
-
-
   }
+
   Widget widgetStatus() {
     return Column(
       children: [
@@ -328,7 +385,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Status (Optional)'),
           ),
@@ -336,6 +393,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetPatientExternalID() {
     return Column(
       children: [
@@ -345,7 +403,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Patient External ID (optional)'),
           ),
@@ -353,6 +411,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetBloodGroup() {
     return Column(
       children: [
@@ -362,7 +421,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Blood Group (optional)'),
           ),
@@ -370,6 +429,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetClinicSite() {
     return Column(
       children: [
@@ -379,7 +439,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.local_hospital),
+                prefixIcon: Icon(Icons.local_hospital),
                 border: OutlineInputBorder(),
                 labelText: 'Clinic Site (optional)'),
           ),
@@ -387,6 +447,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetReferredBy() {
     return Column(
       children: [
@@ -396,7 +457,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Referred By (optional)'),
           ),
@@ -404,6 +465,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetReferredDate() {
     return Column(
       children: [
@@ -413,7 +475,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Referred Date (optional)'),
           ),
@@ -421,6 +483,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetReligion() {
     return Column(
       children: [
@@ -430,7 +493,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Religion (optional)'),
           ),
@@ -438,6 +501,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
+
   Widget widgetParentGuardian() {
     return Column(
       children: [
@@ -447,7 +511,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Parent/Guardian(optional)'),
           ),
@@ -455,7 +519,8 @@ class _AddPatientFormState extends State<AddPatientForm> {
       ],
     );
   }
-  Widget  widgetPaymentProfile() {
+
+  Widget widgetPaymentProfile() {
     return Column(
       children: [
         Padding(
@@ -464,7 +529,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.payments_outlined),
+                prefixIcon: Icon(Icons.payments_outlined),
                 border: OutlineInputBorder(),
                 labelText: 'Payment Profile (optional)'),
           ),
@@ -477,27 +542,28 @@ class _AddPatientFormState extends State<AddPatientForm> {
     return Column(
       children: [
         Align(
-          alignment: Alignment.bottomRight,
+          alignment: Alignment.center,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: EdgeInsets.fromLTRB(8, 10, 8, 10),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 90, vertical: 15),
-                textStyle: TextStyle(fontSize: 20),
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
-              child: Text('Add Patient'),
+              child: Text('Submit'),
               onPressed: () {
                 if (!adPatientFormKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
-                      Text('Error: Some input fields are not filled.')));
+                          Text('Error: Some input fields are not filled.')));
                   return;
                 }
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>DoctorPrefer()
-                ));
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Patient Record successfully Added')));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => DoctorPrefer()));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Patient Record successfully Added')));
                 adPatientFormKey.currentState.save();
                 print(DateOfBirth.toString());
               },
@@ -513,7 +579,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime(1960),
-        lastDate: DateTime(DateTime.now().day+1));
+        lastDate: DateTime(DateTime.now().day + 1));
     if (date != null) {
       setState(() {
         DateOfBirth = date;
@@ -521,6 +587,4 @@ class _AddPatientFormState extends State<AddPatientForm> {
       });
     }
   }
-
-
 }
