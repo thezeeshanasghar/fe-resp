@@ -1,4 +1,4 @@
-import 'package:baby_receptionist/Design/Color.dart';
+import 'package:baby_receptionist/Design/Shade.dart';
 import 'package:flutter/material.dart';
 
 class NewInvoice extends StatefulWidget {

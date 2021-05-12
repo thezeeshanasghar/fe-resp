@@ -1,4 +1,4 @@
-import 'package:baby_receptionist/Design/Color.dart';
+import 'package:baby_receptionist/Design/Shade.dart';
 import 'package:baby_receptionist/Pages/AddPatient.dart';
 import 'package:baby_receptionist/Pages/ExpenseList.dart';
 import 'package:baby_receptionist/Pages/LoginScreen.dart';
