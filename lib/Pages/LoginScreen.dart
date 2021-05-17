@@ -64,10 +64,8 @@ class _LoginScreenState extends State<LoginScreen> {
           onRecoverPassword: _recoverPassword,
           hideSignUpButton: true,
           onSubmitAnimationCompleted: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Home()),
-            );
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/Home');
           }),
     );
   }
