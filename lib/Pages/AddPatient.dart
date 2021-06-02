@@ -14,7 +14,7 @@ class AddPatient extends StatefulWidget {
 }
 
 class _AddPatientState extends State<AddPatient> {
-  final adPatientFormKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
   final DateOfBirthController = TextEditingController();
 
   DateTime DateOfBirth;
@@ -58,7 +58,7 @@ class _AddPatientState extends State<AddPatient> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Form(
-                  key: adPatientFormKey,
+                  key: formKey,
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
                         Dimens.globalPaddingLeft,
@@ -554,7 +554,7 @@ class _AddPatientState extends State<AddPatient> {
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!adPatientFormKey.currentState.validate()) {
+                if (!formKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
                           Text('Error: Some input fields are not filled.')));
@@ -564,7 +564,7 @@ class _AddPatientState extends State<AddPatient> {
                     MaterialPageRoute(builder: (context) => DoctorPrefer()));
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text('Patient Record successfully Added')));
-                adPatientFormKey.currentState.save();
+                formKey.currentState.save();
                 print(DateOfBirth.toString());
               },
             ),
