@@ -7,4 +7,12 @@ class Shade {
   static final Color globalAppBarColor = Colors.blueGrey;
   static final Color drawerHeaderColor = Colors.blueGrey;
   static final Color submitButtonColor = Colors.blueGrey;
+  static final Color snackGlobalSuccess = Colors.blueGrey;
+  static final Color snackGlobalFailed = Colors.red;
+
+  static final Color alertBoxButtonTextDelete = Colors.red;
+  static final Color alertBoxButtonTextCancel = Colors.blueAccent;
+
+  static final Color actionButtonTextDelete = Colors.red;
+  static final Color actionButtonTextEdit = Colors.blueAccent;
 }

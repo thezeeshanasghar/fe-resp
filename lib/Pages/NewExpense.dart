@@ -1,7 +1,13 @@
 import 'package:baby_receptionist/Design/Shade.dart';
+import 'package:baby_receptionist/Service/ExpenseService.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+import 'package:baby_receptionist/Model/Expense.dart';
+import 'dart:convert';
+import 'package:baby_receptionist/Design/Strings.dart';
+
 
 class NewExpense extends StatefulWidget {
   @override
@@ -10,6 +16,9 @@ class NewExpense extends StatefulWidget {
 
 class _NewExpenseState extends State<NewExpense> {
   final NewExpenseKey = GlobalKey<FormState>();
+  String BillType;
+  String PaymentType;
+  String VoucherNo;
   String FinalBill = 'Select Final Bill';
   String CashPayment = 'Payment Option';
   String EmployeeOrVendor='Employee or Vendor';
@@ -19,10 +28,14 @@ class _NewExpenseState extends State<NewExpense> {
   String EmployeeName;
   String TotalBill;
   String TransactionDetails;
-
+  bool loadingButtonProgressIndicator = false;
+  SimpleFontelicoProgressDialog _dialog;
+  ExpenseService expenseService;
   @override
   void initState() {
     super.initState();
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
   }
 
   @override
@@ -32,6 +45,7 @@ class _NewExpenseState extends State<NewExpense> {
 
   @override
   Widget build(BuildContext context) {
+    expenseService = ExpenseService();
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       body: DefaultTextStyle(
@@ -368,20 +382,83 @@ class _NewExpenseState extends State<NewExpense> {
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!NewExpenseKey.currentState.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content:
-                          Text('Error: Some input fields are not filled.')));
-                  return;
-                }
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Successfull')));
-                NewExpenseKey.currentState.save();
+                // if (!NewExpenseKey.currentState.validate()) {
+                //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                //       content:
+                //           Text('Error: Some input fields are not filled.')));
+                //   return;
+                // }
+                // ScaffoldMessenger.of(context)
+                //     .showSnackBar(SnackBar(content: Text('Successfull')));
+                // NewExpenseKey.currentState.save();
+                onPressedSubmitButton();
               },
             ),
           ),
         ),
       ],
     );
+  }
+  onPressedSubmitButton() async {
+    // print(qualificationList);
+    // print(diplomaList);
+    List<dynamic> degrees = [];
+    if (!NewExpenseKey.currentState.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Text('Error: Some input fields are not filled')));
+      return;
+    }
+    setState(() {
+      loadingButtonProgressIndicator = true;
+    });
+    NewExpenseKey.currentState.save();
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
+
+    Expense expense = new Expense(
+        BillType: BillType,
+        PaymentType: PaymentType,
+        EmployeeOrVender: EmployeeOrVendor,
+        VoucherNo: VoucherNo,
+        ExpenseCategory: ExpenseCategory,
+        EmployeeName: EmployeeName,
+        TotalBill: TotalBill,
+        TransactionDetail: TransactionDetails,
+        );
+
+    var json = jsonEncode(expense.toJson());
+    print(json);
+
+    var response = await expenseService.InsertExpense(expense);
+    print(response);
+    if (response == true) {
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
+      _dialog.hide();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalSuccess,
+          content: Row(
+            children: [
+              Text('Success: Created  Expense'),
+            ],
+          )));
+      Navigator.pushNamed(context, Strings.titleHomePage);
+      NewExpenseKey.currentState.reset();
+    } else {
+      _dialog.hide();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Row(
+            children: [
+              Text('Error: Try Again: Failed to add Expense '),
+            ],
+          )));
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
+    }
   }
 }
