@@ -10,7 +10,7 @@ import 'package:baby_receptionist/Pages//PatientList.dart';
 
 void main() {
   runApp(MaterialApp(
-    initialRoute: '/LoginScreen',
+    initialRoute: '/Home',
     routes: {
       '/AddPatient': (context) => AddPatient(),
       '/ExpenseList': (context) => ExpenseList(),

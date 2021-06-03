@@ -152,7 +152,7 @@ class _PatientListState extends State<PatientList> {
           }),
       DatatableHeader(
           value: "FatherName",
-          show: true,
+          show: false,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -168,7 +168,7 @@ class _PatientListState extends State<PatientList> {
           }),
       DatatableHeader(
           value: "DOB",
-          show: true,
+          show: false,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -232,7 +232,7 @@ class _PatientListState extends State<PatientList> {
           }),
       DatatableHeader(
           value: "Refund",
-          show: true,
+          show: false,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
