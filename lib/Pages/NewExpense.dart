@@ -26,7 +26,7 @@ class _NewExpenseState extends State<NewExpense> {
   String ExpenseCategory='Choose Expense Category';
   String VendorName;
   String EmployeeName;
-  String TotalBill;
+  int TotalBill;
   String TransactionDetails;
   bool loadingButtonProgressIndicator = false;
   SimpleFontelicoProgressDialog _dialog;
@@ -328,7 +328,7 @@ class _NewExpenseState extends State<NewExpense> {
               return null;
             },
             onSaved: (String value) {
-              TotalBill = value;
+              TotalBill = int.tryParse(value);
             },
           ),
         ),

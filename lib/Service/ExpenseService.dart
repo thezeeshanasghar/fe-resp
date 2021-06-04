@@ -9,7 +9,7 @@ class ExpenseService {
 
   Future<List<Expense>> getExpenses() async {
     final response =
-    await http.get(Uri.https(Strings.pathAPI, 'api/Doctor'));
+    await http.get(Uri.https(Strings.pathAPI, 'api/expense'));
     if (response.statusCode == 200) {
       final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
       return parsed.map<Expense>((json) => Expense.fromJson(json)).toList();

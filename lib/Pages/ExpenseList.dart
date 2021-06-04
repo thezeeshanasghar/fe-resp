@@ -1,12 +1,13 @@
 import 'dart:math';
-
 import 'package:baby_receptionist/Design/Dimens.dart';
 import 'package:baby_receptionist/Design/Shade.dart';
+import 'package:baby_receptionist/Model/Expense.dart';
 import 'package:baby_receptionist/Pages/NewInvoice.dart';
 import 'package:baby_receptionist/Pages/Refund.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
+import 'package:baby_receptionist/Service/ExpenseService.dart';
 
 class ExpenseList extends StatefulWidget {
   @override
@@ -16,27 +17,30 @@ class ExpenseList extends StatefulWidget {
 class _ExpenseListState extends State<ExpenseList> {
   final formKey = GlobalKey<FormState>();
 
-  // onCall Data
-  List<DatatableHeader> onCallHeaders = [];
-  List<int> onCallPerPage = [5, 10, 15, 100];
-  int onCallTotal = 100;
-  int onCallCurrentPerPage;
-  int onCallCurrentPage = 1;
-  bool onCallIsSearch = false;
-  List<Map<String, dynamic>> onCallIsSource = [];
-  List<Map<String, dynamic>> onCallSelecteds = [];
-  String onCallSelectableKey = "Invoice";
-  String onCallSortColumn;
-  bool onCallSortAscending = true;
-  bool onCallIsLoading = true;
-  bool onCallShowSelect = false;
+  // expense Data
+  List<DatatableHeader> expenseHeaders = [];
+  List<int> expensePerPage = [5, 10, 15, 100];
+  int expenseTotal = 100;
+  int expenseCurrentPerPage;
+  int expenseCurrentPage = 1;
+  bool expenseIsSearch = false;
+  List<Map<String, dynamic>> expenseIsSource = [];
+  List<Map<String, dynamic>> expenseSelecteds = [];
+  List<Expense> listExpenses;
+  String expenseSelectableKey = "Invoice";
+  String expenseSortColumn;
+  bool expenseSortAscending = true;
+  bool expenseIsLoading = true;
+  bool expenseShowSelect = false;
+  ExpenseService expenseService;
 
   @override
   void initState() {
     super.initState();
-    // onCall
-    initializeonCallHeaders();
-    onCallInitData();
+    initVariablesAndClasses();
+    initializeexpenseHeaders();
+    getExpensesFromApiAndLinkToTable();
+    //expenseInitData();
   }
 
   @override
@@ -46,6 +50,7 @@ class _ExpenseListState extends State<ExpenseList> {
 
   @override
   Widget build(BuildContext context) {
+    expenseService = ExpenseService();
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       body: DefaultTextStyle(
@@ -67,7 +72,7 @@ class _ExpenseListState extends State<ExpenseList> {
                       key: formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[widgetonCallPatients()],
+                        children: <Widget>[widgetexpensePatients()],
                       ),
                     )),
               ),
@@ -78,7 +83,7 @@ class _ExpenseListState extends State<ExpenseList> {
     );
   }
 
-  Widget widgetonCallPatients() {
+  Widget widgetexpensePatients() {
     return Card(
       elevation: 1,
       shadowColor: Colors.black,
@@ -87,181 +92,6 @@ class _ExpenseListState extends State<ExpenseList> {
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: [
-            // Padding(
-            //   padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-            //   child: Container(
-            //     color: Colors.grey[50],
-            //     child: Row(
-            //       children: [
-            //         Expanded(
-            //             child: Padding(
-            //               padding: const EdgeInsets.all(10),
-            //               child: Column(
-            //                 crossAxisAlignment: CrossAxisAlignment.start,
-            //                 mainAxisAlignment: MainAxisAlignment.start,
-            //                 children: <Widget>[
-            //                   // Column(
-            //                   //   children: [
-            //                   //     Text(
-            //                   //       'Doctor',
-            //                   //       style: TextStyle(fontWeight: FontWeight.bold),
-            //                   //     ),
-            //                   //   ],
-            //                   // ),
-            //                   Padding(
-            //                     padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-            //                     child: Container(
-            //                       decoration: BoxDecoration(
-            //                           borderRadius: BorderRadius.circular(5),
-            //                           border: Border.all(color: Colors.grey[300])),
-            //                       child: Padding(
-            //                         padding:
-            //                         const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            //                         child: DropdownButton<String>(
-            //                           isExpanded: true,
-            //                           value: dropdownDoctor,
-            //                           elevation: 16,
-            //                           underline: Container(
-            //                             height: 0,
-            //                             color: Colors.deepPurpleAccent,
-            //                           ),
-            //                           onChanged: (String newValue) {
-            //                             setState(() {
-            //                               dropdownDoctor = newValue;
-            //                             });
-            //                           },
-            //                           items: <String>[
-            //                             'Select Doctor',
-            //                             'Dr. Salman',
-            //                             'Dr. Faisal',
-            //                             'Dr. Nawaz',
-            //                             'Dr. Sadia'
-            //                           ].map<DropdownMenuItem<String>>(
-            //                                   (String value) {
-            //                                 return DropdownMenuItem<String>(
-            //                                   value: value,
-            //                                   child: Text(value),
-            //                                 );
-            //                               }).toList(),
-            //                         ),
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ],
-            //               ),
-            //             )),
-            //         Expanded(
-            //             child: Padding(
-            //               padding: const EdgeInsets.all(10),
-            //               child: Column(
-            //                 crossAxisAlignment: CrossAxisAlignment.start,
-            //                 mainAxisAlignment: MainAxisAlignment.start,
-            //                 children: <Widget>[
-            //                   // Column(
-            //                   //   children: [
-            //                   //     Text(
-            //                   //       'Date',
-            //                   //       style: TextStyle(fontWeight: FontWeight.bold),
-            //                   //     ),
-            //                   //   ],
-            //                   // ),
-            //                   Padding(
-            //                     padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-            //                     child: Container(
-            //                       decoration: BoxDecoration(
-            //                           borderRadius: BorderRadius.circular(5),
-            //                           border: Border.all(color: Colors.grey[300])),
-            //                       child: Padding(
-            //                         padding:
-            //                         const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            //                         child: DropdownButton<String>(
-            //                           isExpanded: true,
-            //                           value: dropdownDate,
-            //                           elevation: 16,
-            //                           underline: Container(
-            //                             height: 0,
-            //                             color: Colors.deepPurpleAccent,
-            //                           ),
-            //                           onChanged: (String newValue) {
-            //                             setState(() {
-            //                               dropdownDate = newValue;
-            //                             });
-            //                           },
-            //                           items: <String>[
-            //                             'Select Date',
-            //                             'All',
-            //                           ].map<DropdownMenuItem<String>>(
-            //                                   (String value) {
-            //                                 return DropdownMenuItem<String>(
-            //                                   value: value,
-            //                                   child: Text(value),
-            //                                 );
-            //                               }).toList(),
-            //                         ),
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ],
-            //               ),
-            //             )),
-            //         Expanded(
-            //             child: Padding(
-            //               padding: const EdgeInsets.all(10),
-            //               child: Column(
-            //                 crossAxisAlignment: CrossAxisAlignment.start,
-            //                 mainAxisAlignment: MainAxisAlignment.start,
-            //                 children: <Widget>[
-            //                   // Column(
-            //                   //   children: [
-            //                   //     Text(
-            //                   //       'Booked By',
-            //                   //       style: TextStyle(fontWeight: FontWeight.bold),
-            //                   //     ),
-            //                   //   ],
-            //                   // ),
-            //                   Padding(
-            //                     padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-            //                     child: Container(
-            //                       decoration: BoxDecoration(
-            //                           borderRadius: BorderRadius.circular(5),
-            //                           border: Border.all(color: Colors.grey[300])),
-            //                       child: Padding(
-            //                         padding:
-            //                         const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            //                         child: DropdownButton<String>(
-            //                           isExpanded: true,
-            //                           value: dropdownBookedBy,
-            //                           elevation: 16,
-            //                           underline: Container(
-            //                             height: 0,
-            //                             color: Colors.deepPurpleAccent,
-            //                           ),
-            //                           onChanged: (String newValue) {
-            //                             setState(() {
-            //                               dropdownBookedBy = newValue;
-            //                             });
-            //                           },
-            //                           items: <String>[
-            //                             'Select Booked By',
-            //                             'All',
-            //                           ].map<DropdownMenuItem<String>>(
-            //                                   (String value) {
-            //                                 return DropdownMenuItem<String>(
-            //                                   value: value,
-            //                                   child: Text(value),
-            //                                 );
-            //                               }).toList(),
-            //                         ),
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ],
-            //               ),
-            //             )),
-            //       ],
-            //     ),
-            //   ),
-            // ),
             Container(
               margin: EdgeInsets.all(10),
               padding: EdgeInsets.all(0),
@@ -271,7 +101,7 @@ class _ExpenseListState extends State<ExpenseList> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ResponsiveDatatable(
-                  title: !onCallIsSearch
+                  title: !expenseIsSearch
                       ? Row(
                           children: [
                             Padding(
@@ -286,7 +116,7 @@ class _ExpenseListState extends State<ExpenseList> {
                         )
                       : null,
                   actions: [
-                    if (onCallIsSearch)
+                    if (expenseIsSearch)
                       Expanded(
                           child: TextField(
                         decoration: InputDecoration(
@@ -294,60 +124,60 @@ class _ExpenseListState extends State<ExpenseList> {
                                 icon: Icon(Icons.cancel),
                                 onPressed: () {
                                   setState(() {
-                                    onCallIsSearch = false;
+                                    expenseIsSearch = false;
                                   });
                                 }),
                             suffixIcon: IconButton(
                                 icon: Icon(Icons.search), onPressed: () {})),
                       )),
-                    if (!onCallIsSearch)
+                    if (!expenseIsSearch)
                       IconButton(
                           icon: Icon(Icons.search),
                           onPressed: () {
                             setState(() {
-                              onCallIsSearch = true;
+                              expenseIsSearch = true;
                             });
                           })
                   ],
-                  headers: onCallHeaders,
-                  source: onCallIsSource,
-                  selecteds: onCallSelecteds,
-                  showSelect: onCallShowSelect,
+                  headers: expenseHeaders,
+                  source: expenseIsSource,
+                  selecteds: expenseSelecteds,
+                  showSelect: expenseShowSelect,
                   autoHeight: false,
                   onTabRow: (data) {
                     // print(data);
                   },
                   onSort: (value) {
                     setState(() {
-                      onCallSortColumn = value;
-                      onCallSortAscending = !onCallSortAscending;
-                      if (onCallSortAscending) {
-                        onCallIsSource.sort((a, b) => b["$onCallSortColumn"]
-                            .compareTo(a["$onCallSortColumn"]));
+                      expenseSortColumn = value;
+                      expenseSortAscending = !expenseSortAscending;
+                      if (expenseSortAscending) {
+                        expenseIsSource.sort((a, b) => b["$expenseSortColumn"]
+                            .compareTo(a["$expenseSortColumn"]));
                       } else {
-                        onCallIsSource.sort((a, b) => a["$onCallSortColumn"]
-                            .compareTo(b["$onCallSortColumn"]));
+                        expenseIsSource.sort((a, b) => a["$expenseSortColumn"]
+                            .compareTo(b["$expenseSortColumn"]));
                       }
                     });
                   },
-                  sortAscending: onCallSortAscending,
-                  sortColumn: onCallSortColumn,
-                  isLoading: onCallIsLoading,
+                  sortAscending: expenseSortAscending,
+                  sortColumn: expenseSortColumn,
+                  isLoading: expenseIsLoading,
                   onSelect: (value, item) {
                     print("$value  $item ");
                     if (value) {
-                      setState(() => onCallSelecteds.add(item));
+                      setState(() => expenseSelecteds.add(item));
                     } else {
-                      setState(() => onCallSelecteds
-                          .removeAt(onCallSelecteds.indexOf(item)));
+                      setState(() => expenseSelecteds
+                          .removeAt(expenseSelecteds.indexOf(item)));
                     }
                   },
                   onSelectAll: (value) {
                     if (value) {
-                      setState(() => onCallSelecteds =
-                          onCallIsSource.map((entry) => entry).toList().cast());
+                      setState(() => expenseSelecteds =
+                          expenseIsSource.map((entry) => entry).toList().cast());
                     } else {
-                      setState(() => onCallSelecteds.clear());
+                      setState(() => expenseSelecteds.clear());
                     }
                   },
                   footers: [
@@ -355,12 +185,12 @@ class _ExpenseListState extends State<ExpenseList> {
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       child: Text("Rows per page:"),
                     ),
-                    if (onCallPerPage != null)
+                    if (expensePerPage != null)
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButton(
-                            value: onCallCurrentPerPage,
-                            items: onCallPerPage
+                            value: expenseCurrentPerPage,
+                            items: expensePerPage
                                 .map((e) => DropdownMenuItem(
                                       child: Text("$e"),
                                       value: e,
@@ -368,14 +198,14 @@ class _ExpenseListState extends State<ExpenseList> {
                                 .toList(),
                             onChanged: (value) {
                               setState(() {
-                                onCallCurrentPerPage = value;
+                                expenseCurrentPerPage = value;
                               });
                             }),
                       ),
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       child: Text(
-                          "$onCallCurrentPage - $onCallCurrentPerPage of $onCallTotal"),
+                          "$expenseCurrentPage - $expenseCurrentPerPage of $expenseTotal"),
                     ),
                     IconButton(
                       icon: Icon(
@@ -384,8 +214,8 @@ class _ExpenseListState extends State<ExpenseList> {
                       ),
                       onPressed: () {
                         setState(() {
-                          onCallCurrentPage = onCallCurrentPage >= 2
-                              ? onCallCurrentPage - 1
+                          expenseCurrentPage = expenseCurrentPage >= 2
+                              ? expenseCurrentPage - 1
                               : 1;
                         });
                       },
@@ -395,7 +225,7 @@ class _ExpenseListState extends State<ExpenseList> {
                       icon: Icon(Icons.arrow_forward_ios, size: 16),
                       onPressed: () {
                         setState(() {
-                          onCallCurrentPage++;
+                          expenseCurrentPage++;
                         });
                       },
                       padding: EdgeInsets.symmetric(horizontal: 15),
@@ -408,38 +238,61 @@ class _ExpenseListState extends State<ExpenseList> {
     );
   }
 
-  // onCall
-  List<Map<String, dynamic>> onCallGenerateData({int n: 100}) {
-    final List sourceonCall = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> tempsonCall = [];
-    var i = onCallIsSource.length;
+  // expense
+  List<Map<String, dynamic>> expenseGenerateData({int n: 100}) {
+    final List sourceexpense = List.filled(n, Random.secure());
+    List<Map<String, dynamic>> tempsexpense = [];
+    var i = expenseIsSource.length;
     print(i);
-    for (var data in sourceonCall) {
-      tempsonCall.add({
+    for (var data in sourceexpense) {
+      tempsexpense.add({
         "No": i+1,
-        "Date": "Feb 24, 2021",
+        //"Date": "Feb 24, 2021",
+        "Bill Type": "utility",
+        "Payment Type":"cash",
         "Employee": "Syed Basit Ali Shah $i",
-        "Vendor": "Vendor $i",
-        "BalanceReceived": i + 100,
-        "AdvanceIssued": "1000",
-        "FinalBill": "$i 000",
+        "VoucherNo": "12345",
+        "ExpenseCategory": i + 100, // show false
+        "EmployeeName": "1000",  // show false
+        "TotalBill": "$i 000",
         "Action": [i, 100],
       });
       i++;
     }
-    return tempsonCall;
+    return tempsexpense;
   }
+  
+  
 
-  onCallInitData() async {
-    setState(() => onCallIsLoading = true);
+  expenseInitData() async {
+    setState(() => expenseIsLoading = true);
     Future.delayed(Duration(seconds: 0)).then((value) {
-      onCallIsSource.addAll(onCallGenerateData(n: 100));
-      setState(() => onCallIsLoading = false);
+      expenseIsSource.addAll(expenseGenerateData(n: 100));
+      setState(() => expenseIsLoading = false);
     });
   }
 
-  initializeonCallHeaders() {
-    onCallHeaders = [
+  void initVariablesAndClasses() {
+    expenseHeaders = [];
+    expensePerPage = [5, 10, 15, 100];
+    expenseTotal = 100;
+    expenseCurrentPerPage;
+    expenseCurrentPage = 1;
+    expenseIsSearch = false;
+    expenseIsSource = [];
+    expenseSelecteds = [];
+    expenseSelectableKey = "Invoice";
+    expenseSortColumn;
+    expenseSortAscending = true;
+    expenseIsLoading = true;
+    expenseShowSelect = false;
+    listExpenses = [];
+   // showSearchedList = false;
+    expenseService = ExpenseService();
+  }
+
+  initializeexpenseHeaders() {
+    expenseHeaders = [
       DatatableHeader(
           value: "No",
           show: true,
@@ -458,7 +311,7 @@ class _ExpenseListState extends State<ExpenseList> {
           }),
       DatatableHeader(
           value: "Date",
-          show: true,
+          show: false,
           flex: 1,
           sortable: true,
           textAlign: TextAlign.center,
@@ -473,8 +326,9 @@ class _ExpenseListState extends State<ExpenseList> {
               ),
             );
           }),
+
       DatatableHeader(
-          value: "Employee",
+          value: "Bill Type",
           show: true,
           flex: 2,
           sortable: true,
@@ -484,14 +338,48 @@ class _ExpenseListState extends State<ExpenseList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Employee",
+                  "Bill Type",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "Vendor",
+          value: "Payment Type",
+          show: true,
+          flex: 2,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Payment Type",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "EmployeeOrVender",
+          show: true,
+          flex: 2,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Employee / Vendor",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "VoucherNo",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -500,14 +388,14 @@ class _ExpenseListState extends State<ExpenseList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Vendor",
+                  "Voucher No.",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "BalanceReceived",
+          value: "ExpenseCategory",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -516,14 +404,14 @@ class _ExpenseListState extends State<ExpenseList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Balance Received",
+                  "Category",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "AdvanceIssued",
+          value: "TotalBill",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -532,15 +420,15 @@ class _ExpenseListState extends State<ExpenseList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Advance Issued",
+                  "Total Bill",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "FinalBill",
-          show: true,
+          value: "TransactionDetail",
+          show: false,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -548,7 +436,7 @@ class _ExpenseListState extends State<ExpenseList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Final Bill",
+                  "Transaction Details",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -589,4 +477,35 @@ class _ExpenseListState extends State<ExpenseList> {
           }),
     ];
   }
+
+  void getExpensesFromApiAndLinkToTable() async {
+    setState(() => expenseIsLoading = true);
+    listExpenses = [];
+    expenseIsSource = [];
+    listExpenses = await expenseService.getExpenses();
+    print(listExpenses);
+    expenseIsSource.addAll(generateExpenseDataFromApi(listExpenses));
+    setState(() => expenseIsLoading = false);
+  }
+
+  List<Map<String, dynamic>> generateExpenseDataFromApi(
+      List<Expense> listOfExpenses) {
+    List<Map<String, dynamic>> tempsexpense = [];
+    for (Expense expense in listOfExpenses) {
+      tempsexpense.add({
+        "Id": expense.id,
+        "BillType": expense.BillType,
+        "PaymentType": expense.PaymentType,
+        "EmployeeOrVender": expense.EmployeeOrVender,
+        "VoucherNo": expense.VoucherNo,
+        "ExpenseCategory": expense.ExpenseCategory,
+        "EmployeeName": expense.EmployeeName,
+        "TotalBill": expense.TotalBill,
+        "Action": expense.id,
+      });
+    }
+    return tempsexpense;
+  }
+
+
 }

@@ -7,7 +7,7 @@ class Expense {
   final String VoucherNo;
   final String ExpenseCategory;
   final String EmployeeName;
-  final String TotalBill;
+  final int TotalBill;
   final String TransactionDetail;
 
 
@@ -26,14 +26,14 @@ class Expense {
   factory Expense.fromJson(Map<String, dynamic> json) {
     return Expense(
       id: json['id'],
-      BillType: json['BillType'],
-      PaymentType: json['PaymentType'],
-      EmployeeOrVender: json['EmployeeOrVender'],
-      VoucherNo: json['VoucherNo'],
-      ExpenseCategory: json['ExpenseCategory'],
-      EmployeeName: json['EmployeeName'],
-      TotalBill: json['TotalBill'],
-      TransactionDetail: json['TransactionDetail']
+      BillType: json['billType'],
+      PaymentType: json['paymentType'],
+      EmployeeOrVender: json['employeeOrVender'],
+      VoucherNo: json['voucherNo'],
+      ExpenseCategory: json['expenseCategory'],
+      EmployeeName: json['employeeName'],
+      TotalBill: json['totalBill'],
+      TransactionDetail: json['transactionDetail']
     );
   }
 
