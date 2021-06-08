@@ -1,5 +1,13 @@
+import 'dart:convert';
+
+import 'package:baby_receptionist/Arguments/PatientArguments.dart';
 import 'package:baby_receptionist/Design/Shade.dart';
+import 'package:baby_receptionist/Model/Invoice.dart';
+import 'package:baby_receptionist/Model/PatientInvoice.dart';
+import 'package:baby_receptionist/Service/InvoiceService.dart';
+import 'package:baby_receptionist/Service/PatientService.dart';
 import 'package:flutter/material.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class NewInvoice extends StatefulWidget {
   @override
@@ -8,14 +16,13 @@ class NewInvoice extends StatefulWidget {
 
 class _NewInvoiceState extends State<NewInvoice> {
   final formKey = GlobalKey<FormState>();
-  final DateOneController = TextEditingController();
-  final DateTwoController = TextEditingController();
-  final DateThreeController = TextEditingController();
-
-  DateTime DateOne;
-  DateTime DateTwo;
+  final lastVisitDateController = TextEditingController();
+  final TodayVisitDateController = TextEditingController();
+  final DateOfBirthController = TextEditingController();
+  DateTime lastVisit;
+  DateTime TodayVisit;
   DateTime DateThree;
-  String Invoice = "Select Invoice";
+  String Invoices = "Select Invoice";
   String Name;
   String FatherName;
   String Email;
@@ -23,25 +30,78 @@ class _NewInvoiceState extends State<NewInvoice> {
   String City = "Select City";
   String CityDetail = "Select City Detail";
   String Block;
-  String DoctorName='Select Doctor';
-  String DoctorType='Select Doctor Type';
+  String DoctorName = 'Select Doctor';
+  String DoctorType = 'Select Doctor Type';
   int Fee;
-  String PaymentType="Select Payment Type";
-  String ProcedureType="Select Procedure Type";
+  String PaymentType = "Select Payment Type";
+  String ProcedureType = "Select Procedure Type";
   int Total;
   int Discount;
   int NetTotal;
   int Disposable;
   int GrossTotal;
+  PatientService patientService;
+  bool isLoading = false;
+  SimpleFontelicoProgressDialog _dialog;
+  TextEditingController _namecontroller;
+  TextEditingController _fatherhusbandnamecontroller;
+  bool loadingButtonProgressIndicator = false;
+  TextEditingController _citycontroller;
+  TextEditingController _LocalAreacontroller;
+  TextEditingController _emailcontroller;
+  TextEditingController _contactcontroller;
+  bool hasRun = false;
+  PatientArguments args;
+  int PatientId;
 
   @override
   void initState() {
     super.initState();
+    initVariablesAndClasses();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    if (!hasRun) {
+      args = ModalRoute.of(context).settings.arguments;
+      PatientId = args.Id;
+      getPatientData(PatientId);
+      hasRun = true;
+    }
+  }
+
+  void getPatientData(int Id) async {
+    patientService = PatientService();
+    PatientSingleInvoice resp = await patientService.getPatientInvoiceById(Id);
+    setState(() {
+      print(resp);
+      _namecontroller.text = resp.data.name;
+      _fatherhusbandnamecontroller.text = resp.data.fatherHusbandName;
+      DateOfBirthController.text = resp.data.dob.substring(0, 10);
+      lastVisitDateController.text =
+          resp.data.lastAppointmentDate.substring(0, 10);
+      TodayVisitDateController.text =
+          DateTime.now().toString().substring(0, 10);
+      _citycontroller.text = resp.data.city;
+      _LocalAreacontroller.text = resp.data.area;
+      _emailcontroller.text = resp.data.email;
+      _contactcontroller.text = resp.data.contact;
+    });
+  }
+
+  void initVariablesAndClasses() {
+    _namecontroller = new TextEditingController();
+    _fatherhusbandnamecontroller = new TextEditingController();
+    _citycontroller = new TextEditingController();
+    _LocalAreacontroller = new TextEditingController();
+    _emailcontroller = new TextEditingController();
+    _contactcontroller = new TextEditingController();
+    patientService = PatientService();
   }
 
   @override
@@ -101,7 +161,7 @@ class _NewInvoiceState extends State<NewInvoice> {
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: EdgeInsets.fromLTRB(8,10,8,10),
+            padding: EdgeInsets.fromLTRB(8, 10, 8, 10),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -110,14 +170,7 @@ class _NewInvoiceState extends State<NewInvoice> {
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
-              onPressed: () {
-                if (!formKey.currentState.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content:
-                      Text('Error: Some input fields are not filled.')));
-                  return;
-                }
-              },
+              onPressed: () {},
             ),
           ),
         ),
@@ -317,11 +370,8 @@ class _NewInvoiceState extends State<NewInvoice> {
                 ProcedureType = newValue;
               });
             },
-            items: <String>[
-              'Select Procedure Type',
-              'Procedure',
-              'Medicine'
-            ].map<DropdownMenuItem<String>>((String value) {
+            items: <String>['Select Procedure Type', 'Procedure', 'Medicine']
+                .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value),
@@ -491,7 +541,6 @@ class _NewInvoiceState extends State<NewInvoice> {
     );
   }
 
-
   Widget widgetRowFive() {
     return Row(
       children: [
@@ -502,78 +551,56 @@ class _NewInvoiceState extends State<NewInvoice> {
   }
 
   Widget widgetCityDetail() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.grey)),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: CityDetail,
-            elevation: 16,
-            underline: Container(
-              height: 0,
-              color: Colors.deepPurpleAccent,
-            ),
-            onChanged: (String newValue) {
-              setState(() {
-                CityDetail = newValue;
-              });
-            },
-            items: <String>[
-              'Select City Detail',
-              'Other',
-            ].map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+              autofocus: false,
+              readOnly: true,
+              controller: _LocalAreacontroller,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                  labelText: 'Local Area'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                CityDetail = value;
+              }),
         ),
-      ),
+      ],
     );
   }
 
   Widget widgetCity() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.grey)),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: City,
-            elevation: 16,
-            underline: Container(
-              height: 0,
-              color: Colors.deepPurpleAccent,
-            ),
-            onChanged: (String newValue) {
-              setState(() {
-                City = newValue;
-              });
-            },
-            items: <String>[
-              'Select City',
-              'Islamabad',
-              'Rawalpindi',
-              'Lahore',
-            ].map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+              autofocus: false,
+              readOnly: true,
+              controller: _citycontroller,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                  labelText: 'City'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                City = value;
+              }),
         ),
-      ),
+      ],
     );
   }
 
@@ -594,6 +621,8 @@ class _NewInvoiceState extends State<NewInvoice> {
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
+              readOnly: true,
+              controller: _contactcontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
@@ -627,13 +656,15 @@ class _NewInvoiceState extends State<NewInvoice> {
           child: TextFormField(
               maxLength: 40,
               autofocus: false,
+              readOnly: true,
+              controller: _emailcontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                   labelText: 'Email'),
               validator: (String value) {
                 bool emailValid = RegExp(
-                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                     .hasMatch(value);
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -667,6 +698,8 @@ class _NewInvoiceState extends State<NewInvoice> {
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: TextFormField(
               autofocus: false,
+              readOnly: true,
+              controller: _namecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
@@ -717,6 +750,8 @@ class _NewInvoiceState extends State<NewInvoice> {
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
               autofocus: false,
+              readOnly: true,
+              controller: _fatherhusbandnamecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
@@ -751,11 +786,12 @@ class _NewInvoiceState extends State<NewInvoice> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-            controller: DateOneController,
+            controller: lastVisitDateController,
+            enabled: false,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
-              labelText: 'Date One',
+              labelText: 'Previous Visit Date',
             ),
             validator: (String value) {
               if (value == null || value.isEmpty) {
@@ -763,7 +799,7 @@ class _NewInvoiceState extends State<NewInvoice> {
               }
             },
             onSaved: (String value) {
-              DateOne = DateTime.parse(value);
+              lastVisit = DateTime.parse(value);
             },
             onTap: () {
               pickDateOne();
@@ -780,11 +816,12 @@ class _NewInvoiceState extends State<NewInvoice> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-            controller: DateTwoController,
+            controller: TodayVisitDateController,
+            enabled: false,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
-              labelText: 'Date Two',
+              labelText: 'Today Visit Date',
             ),
             validator: (String value) {
               if (value == null || value.isEmpty) {
@@ -792,7 +829,7 @@ class _NewInvoiceState extends State<NewInvoice> {
               }
             },
             onSaved: (String value) {
-              DateTwo = DateTime.parse(value);
+              TodayVisit = DateTime.parse(value);
             },
             onTap: () {
               pickDateTwo();
@@ -809,11 +846,12 @@ class _NewInvoiceState extends State<NewInvoice> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-            controller: DateTwoController,
+            enabled: false,
+            controller: DateOfBirthController,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
-              labelText: 'Date Three',
+              labelText: 'Date of Birth',
             ),
             validator: (String value) {
               if (value == null || value.isEmpty) {
@@ -843,7 +881,7 @@ class _NewInvoiceState extends State<NewInvoice> {
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: DropdownButton<String>(
             isExpanded: true,
-            value: Invoice,
+            value: Invoices,
             elevation: 16,
             underline: Container(
               height: 0,
@@ -851,7 +889,7 @@ class _NewInvoiceState extends State<NewInvoice> {
             ),
             onChanged: (String newValue) {
               setState(() {
-                Invoice = newValue;
+                Invoices = newValue;
               });
             },
             items: <String>[
@@ -870,18 +908,16 @@ class _NewInvoiceState extends State<NewInvoice> {
     );
   }
 
-
-
   pickDateOne() async {
     DateTime date = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
+        firstDate: DateTime(DateTime.now().year - 2),
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        DateOne = date;
-        DateOneController.text = date.toString();
+        lastVisit = date;
+        lastVisitDateController.text = date.toString();
       });
     }
   }
@@ -894,8 +930,8 @@ class _NewInvoiceState extends State<NewInvoice> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        DateTwo = date;
-        DateTwoController.text = date.toString();
+        TodayVisit = date;
+        TodayVisitDateController.text = date.toString().substring(0, 10);
       });
     }
   }
@@ -905,11 +941,11 @@ class _NewInvoiceState extends State<NewInvoice> {
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime.now(),
-        lastDate: DateTime(DateTime.now().year + 1));
+        lastDate: DateTime.now());
     if (date != null) {
       setState(() {
         DateThree = date;
-        DateThreeController.text = date.toString();
+        DateOfBirthController.text = date.toString();
       });
     }
   }

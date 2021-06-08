@@ -1,10 +1,14 @@
+import 'dart:convert';
 import 'dart:math';
-
+import 'package:baby_receptionist/Arguments/PatientArguments.dart';
+import 'package:baby_receptionist/Design/Strings.dart';
+import 'package:baby_receptionist/Model/PatientInvoice.dart';
 import 'package:baby_receptionist/Pages/NewInvoice.dart';
 import 'package:baby_receptionist/Pages/Refund.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
+import 'package:baby_receptionist/Service/PatientService.dart';
 
 class PatientList extends StatefulWidget {
   @override
@@ -24,7 +28,7 @@ class _PatientListState extends State<PatientList> {
   int walkInTotal = 100;
   int walkInCurrentPerPage;
   int walkInCurrentPage = 1;
-  bool walkInIsSearch = false;
+  bool walkInIsSearch;
   List<Map<String, dynamic>> walkInIsSource = [];
   List<Map<String, dynamic>> walkInSelecteds = [];
   String walkInSelectableKey = "Invoice";
@@ -32,6 +36,9 @@ class _PatientListState extends State<PatientList> {
   bool walkInSortAscending = true;
   bool walkInIsLoading = true;
   bool walkInShowSelect = false;
+  PatientInvoice listWalkIns;
+
+  PatientService patientService;
 
   String dropdownDoctor = "Select Doctor";
   String dropdownDate = "Select Date";
@@ -48,6 +55,7 @@ class _PatientListState extends State<PatientList> {
   List<Map<String, dynamic>> onlineSelecteds = [];
   String onlineSelectableKey = "Invoice";
   String onlineSortColumn;
+  String PatientId;
   bool onlineSortAscending = true;
   bool onlineIsLoading = true;
   bool onlineShowSelect = false;
@@ -68,35 +76,78 @@ class _PatientListState extends State<PatientList> {
   bool admittedShowSelect = false;
 
   // walk in
-  List<Map<String, dynamic>> walkInGenerateData({int n: 100}) {
-    final List source = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> temps = [];
-    var i = walkInIsSource.length;
-    print(i);
-    for (var data in source) {
-      temps.add({
-        "Invoice": i + 1000,
-        "Date": "Feb 24, 2021",
-        "Name": "Syed Basit Ali Shah $i",
-        "FatherName": "Father-$i",
-        "DOB": "Jan 18, 1994",
-        "Total": "Rs. 20",
-        "Discount": "Rs. 1$i",
-        "NetTotal": "Rs. 5$i",
-        "Refund": "Rs. 0",
-        "NewInvoice": [i, 100],
-      });
-      i++;
-    }
-    return temps;
+  // List<Map<String, dynamic>> walkInGenerateData({int n: 100}) {
+  //   final List source = List.filled(n, Random.secure());
+  //   List<Map<String, dynamic>> temps = [];
+  //   var i = walkInIsSource.length;
+  //   print(i);
+  //   for (var data in source) {
+  //     temps.add({
+  //       "Invoice": i + 1000,
+  //       "Date": "Feb 24, 2021",
+  //       "Name": "Syed Basit Ali Shah $i",
+  //       "FatherName": "Father-$i",
+  //       "DOB": "Jan 18, 1994",
+  //       "Total": "Rs. 20",
+  //       "Discount": "Rs. 1$i",
+  //       "NetTotal": "Rs. 5$i",
+  //       "Refund": "Rs. 0",
+  //       "NewInvoice": [i, 100],
+  //     });
+  //     i++;
+  //   }
+  //   return temps;
+  // }
+
+  // walkInInitData() async {
+  //   setState(() => walkInIsLoading = true);
+  //   Future.delayed(Duration(seconds: 0)).then((value) {
+  //     walkInIsSource.addAll(walkInGenerateData(n: 100));
+  //     setState(() => walkInIsLoading = false);
+  //   });
+  //
+  // }
+
+  void initWalkInVariablesAndClasses() {
+    walkInHeaders = [];
+    walkInPerPage = [5, 10, 15, 100];
+    walkInTotal = 100;
+    walkInCurrentPerPage;
+    walkInCurrentPage = 1;
+    walkInIsSearch = false;
+    walkInIsSource = [];
+    walkInSelecteds = [];
+    walkInSelectableKey = "Invoice";
+    walkInSortColumn;
+    walkInSortAscending = true;
+    walkInIsLoading = true;
+    walkInShowSelect = false;
+
+    patientService = PatientService();
   }
 
-  walkInInitData() async {
+  void getPatientsFromApiAndLinkToTable() async {
     setState(() => walkInIsLoading = true);
-    Future.delayed(Duration(seconds: 0)).then((value) {
-      walkInIsSource.addAll(walkInGenerateData(n: 100));
-      setState(() => walkInIsLoading = false);
-    });
+
+    walkInIsSource = [];
+    listWalkIns = await patientService.getPatientInvoice();
+    walkInIsSource.addAll(generatewalkInDataFromApi(listWalkIns.data));
+    setState(() => walkInIsLoading = false);
+  }
+
+  List<Map<String, dynamic>> generatewalkInDataFromApi(
+      List<PatientInvoiceData> listWalkIns) {
+    List<Map<String, dynamic>> tempswalkIn = [];
+    for (PatientInvoiceData patients in listWalkIns) {
+      tempswalkIn.add({
+        "Invoice": patients.id,
+        "Name": patients.name,
+        "FatherName": patients.fatherHusbandName,
+        "DOB": "patients.dob",
+        "Action": patients.patientId,
+      });
+    }
+    return tempswalkIn;
   }
 
   initializeWalkInHeaders() {
@@ -152,7 +203,7 @@ class _PatientListState extends State<PatientList> {
           }),
       DatatableHeader(
           value: "FatherName",
-          show: false,
+          show: true,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -247,7 +298,7 @@ class _PatientListState extends State<PatientList> {
             );
           }),
       DatatableHeader(
-          value: "NewInvoice",
+          value: "Action",
           show: true,
           flex: 3,
           sortable: true,
@@ -257,52 +308,51 @@ class _PatientListState extends State<PatientList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Action",
+                  "New Invoice",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           },
-          sourceBuilder: (value, row) {
+          sourceBuilder: (Id, row) {
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-            TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => NewInvoice()),
-                  );
-                },
-                child: Text('New Invoice')),
-            SizedBox(
-              width: 5,
-            ),
-            TextButton(
-                onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => Refund()),
-                  // );
-                },
-                child: Text(
-                  'Admit',
-                  style: TextStyle(color: Colors.green),
-                )),
-            SizedBox(
-              width: 5,
-            ),
-            TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Refund()),
-                  );
-                },
-                child: Text(
-                  'Refund',
-                  style: TextStyle(color: Colors.red),
-                )),
+                TextButton(
+                    onPressed: () {
+                      print(Id);
+                      Navigator.pushNamed(context, Strings.routeNewInvoice,
+                          arguments: PatientArguments(Id: Id));
+                    },
+                    child: Text('New Invoice')),
+                SizedBox(
+                  width: 5,
+                ),
+                TextButton(
+                    onPressed: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (context) => Refund()),
+                      // );
+                    },
+                    child: Text(
+                      'Admit',
+                      style: TextStyle(color: Colors.green),
+                    )),
+                SizedBox(
+                  width: 5,
+                ),
+                TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Refund()),
+                      );
+                    },
+                    child: Text(
+                      'Refund',
+                      style: TextStyle(color: Colors.red),
+                    )),
               ],
             );
           }),
@@ -454,17 +504,16 @@ class _PatientListState extends State<PatientList> {
               ),
             );
           },
-          sourceBuilder: (value, row) {
+          sourceBuilder: (Id, row) {
             return Container(
                 child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => NewInvoice()),
-                      );
+                      print(Id);
+                      Navigator.pushNamed(context, Strings.routeNewInvoice,
+                          arguments: PatientArguments(Id: Id));
                     },
                     child: Text('New Invoice')),
                 SizedBox(
@@ -668,9 +717,11 @@ class _PatientListState extends State<PatientList> {
   @override
   void initState() {
     super.initState();
+    patientService = PatientService();
     // walk in
+    initWalkInVariablesAndClasses();
     initializeWalkInHeaders();
-    walkInInitData();
+    getPatientsFromApiAndLinkToTable();
 
     // online
     initializeOnlineHeaders();

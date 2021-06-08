@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:baby_receptionist/Model/Patient.dart';
+import 'package:baby_receptionist/Model/PatientInvoice.dart';
 
 import 'package:http/http.dart' as http;
 
 class PatientService {
   Future<List<Patient>> getPatient() async {
-    final response = await http.get(Uri.https('babymedics.fernflowers.com', 'api/Patient'));
+    final response =
+        await http.get(Uri.https('babymedics.fernflowers.com', 'api/Patient'));
     if (response.statusCode == 200) {
       final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
       return parsed.map<Patient>((json) => Patient.fromJson(json)).toList();
@@ -14,23 +16,34 @@ class PatientService {
     }
   }
 
-  Future<Patient> getPatientById(int Id) async {
-    final response =
-        await http.get(Uri.https('babymedics.fernflowers.com', 'api/Patient/${Id}'));
+  Future<PatientInvoice> getPatientInvoice() async {
+    final response = await http
+        .get(Uri.https('babymedics.fernflowers.com', 'api/Patient/Invoices'));
     if (response.statusCode == 200) {
-      final JsonResponse = jsonDecode(response.body);
-      return Patient.fromJson(JsonResponse);
+      final jsonReponse = jsonDecode(response.body);
+      return PatientInvoice.fromJson(jsonReponse);
     } else {
-      throw Exception('Failed to load Patient');
+      throw Exception('Failed to load Patients');
     }
   }
 
-  Future<bool> InsertPatient(Patient patients) async {
+  Future<PatientSingleInvoice> getPatientInvoiceById(int Id) async {
+    final response = await http.get(Uri.https(
+        'babymedics.fernflowers.com', 'api/Patient/Invoices/get/${Id}'));
+    if (response.statusCode == 200) {
+      final JsonResponse = jsonDecode(response.body);
+      return PatientSingleInvoice.fromJson(JsonResponse);
+    } else {
+      throw Exception('Failed to load Patients');
+    }
+  }
+
+  Future<bool> InsertPatient(PatientData patients) async {
     print(patients);
     Map<String, dynamic> Obj = {
       "name": patients.name,
       "sex": patients.sex,
-      "address": patients.address,
+      "cnic": patients.cnic,
       "fatherHusbandName": patients.fatherHusbandName,
       "email": patients.email,
       "city": patients.city,
@@ -51,7 +64,8 @@ class PatientService {
       "patientGardian": patients.patientGardian,
       "paymentProfile": patients.paymentProfile,
     };
-    final response = await http.post(Uri.https('babymedics.fernflowers.com', 'api/Patient'),
+    final response = await http.post(
+        Uri.https('babymedics.fernflowers.com', 'api/Patient/Insert'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -63,7 +77,7 @@ class PatientService {
     }
   }
 
-  Future<bool> UpdatePatient(Patient patients) async {
+  Future<bool> UpdatePatient(PatientData patients) async {
     final response = await http.put(
         Uri.https('babymedics.fernflowers.com', 'api/Patient/${patients.id}'),
         headers: <String, String>{

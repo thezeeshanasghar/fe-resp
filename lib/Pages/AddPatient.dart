@@ -479,7 +479,6 @@ class _AddPatientState extends State<AddPatient> {
     ]);
   }
 
-
   Widget widgetCNIC() {
     return Column(
       children: [
@@ -610,13 +609,13 @@ class _AddPatientState extends State<AddPatient> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-            autofocus: false,
-            maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Blood Group (optional)'),
-                onSaved: (String value) {
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                  labelText: 'Blood Group (optional)'),
+              onSaved: (String value) {
                 bloodGroup = value;
               }),
         ),
@@ -630,13 +629,13 @@ class _AddPatientState extends State<AddPatient> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-            autofocus: false,
-            maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.local_hospital),
-                border: OutlineInputBorder(),
-                labelText: 'Clinic Site (optional)'),
-                onSaved: (String value) {
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.local_hospital),
+                  border: OutlineInputBorder(),
+                  labelText: 'Clinic Site (optional)'),
+              onSaved: (String value) {
                 clinicSite = value;
               }),
         ),
@@ -650,13 +649,13 @@ class _AddPatientState extends State<AddPatient> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-            autofocus: false,
-            maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Referred By (optional)'),
-                onSaved: (String value) {
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                  labelText: 'Referred By (optional)'),
+              onSaved: (String value) {
                 referedBy = value;
               }),
         ),
@@ -680,7 +679,6 @@ class _AddPatientState extends State<AddPatient> {
               border: OutlineInputBorder(),
               labelText: 'Referred Date (Optional)',
             ),
-
             onSaved: (String value) {
               referedDate = value;
             },
@@ -699,13 +697,13 @@ class _AddPatientState extends State<AddPatient> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-            autofocus: false,
-            maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Religion (optional)'),
-               onSaved: (String value) {
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                  labelText: 'Religion (optional)'),
+              onSaved: (String value) {
                 religion = value;
               }),
         ),
@@ -719,13 +717,13 @@ class _AddPatientState extends State<AddPatient> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-            autofocus: false,
-            maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Parent/Guardian(optional)'),
-                onSaved: (String value) {
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                  labelText: 'Parent/Guardian(optional)'),
+              onSaved: (String value) {
                 patientGardian = value;
               }),
         ),
@@ -739,13 +737,13 @@ class _AddPatientState extends State<AddPatient> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
-            autofocus: false,
-            maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.payments_outlined),
-                border: OutlineInputBorder(),
-                labelText: 'Payment Profile (optional)'),
-                onSaved: (String value) {
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.payments_outlined),
+                  border: OutlineInputBorder(),
+                  labelText: 'Payment Profile (optional)'),
+              onSaved: (String value) {
                 paymentProfile = value;
               }),
         ),
@@ -791,10 +789,11 @@ class _AddPatientState extends State<AddPatient> {
     if (date != null) {
       setState(() {
         dob = date.toString();
-        DOBController.text = dob.toString();
+        DOBController.text = dob.toString().substring(0, 10);
       });
     }
   }
+
   pickReferedDob() async {
     DateTime date = await showDatePicker(
         context: context,
@@ -808,6 +807,7 @@ class _AddPatientState extends State<AddPatient> {
       });
     }
   }
+
   onPressedSubmitButton() async {
     // print(qualificationList);
     // print(diplomaList);
@@ -824,10 +824,11 @@ class _AddPatientState extends State<AddPatient> {
     formKey.currentState.save();
     _dialog.show(
         message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
+        type: SimpleFontelicoProgressDialogType.multilines,
+        width: MediaQuery.of(context).size.width - 50);
 
-    Patient patient = new Patient(
-        name:name,
+    PatientData patient = new PatientData(
+        name: name,
         sex: Sex,
         fatherHusbandName: fatherHusbandName,
         email: email,
@@ -835,7 +836,7 @@ class _AddPatientState extends State<AddPatient> {
         localArea: localArea,
         dob: dob,
         patientDetails: "dob",
-        address: "dob",
+        cnic: cnic,
         contact: contact,
         placeofBirth: placeofBirth,
         patientCategory: PatientCategory,
@@ -848,12 +849,11 @@ class _AddPatientState extends State<AddPatient> {
         referedDate: referedDate,
         religion: religion,
         patientGardian: patientGardian,
-        paymentProfile: paymentProfile
-    );
+        paymentProfile: paymentProfile);
 
     var json = jsonEncode(patient.toJson());
     print(json);
-      print(patient);
+    print(patient);
     var response = await patientService.InsertPatient(patient);
     print(response);
     if (response == true) {
