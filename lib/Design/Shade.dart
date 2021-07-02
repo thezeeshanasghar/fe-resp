@@ -15,4 +15,10 @@ class Shade {
 
   static final Color actionButtonTextDelete = Colors.red;
   static final Color actionButtonTextEdit = Colors.blueAccent;
+
+
+  static final Color elevatorButtonBackgroundStart = Colors.green;
+  static final Color elevatorButtonBackgroundStop = Colors.red;
+
+
 }

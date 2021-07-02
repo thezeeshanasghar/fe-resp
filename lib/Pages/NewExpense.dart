@@ -48,6 +48,12 @@ class _NewExpenseState extends State<NewExpense> {
     expenseService = ExpenseService();
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
+      appBar: AppBar(
+        title: Text(Strings.titleAddExpense),
+        centerTitle: false,
+        backgroundColor: Shade.globalAppBarColor,
+        elevation: 0.0,
+      ),
       body: DefaultTextStyle(
         style: Theme.of(context).textTheme.bodyText2,
         child: LayoutBuilder(

@@ -1,3 +1,4 @@
+import 'package:baby_receptionist/Model/Appointment.dart';
 import 'package:flutter/foundation.dart';
 
 class Invoice {
@@ -27,6 +28,7 @@ class InvoiceData {
   final String TodayVisitDate;
   final int ConsultationFee;
   final int Discount;
+  final int NetAmount;
   final int Disposibles;
   final int GrossAmount;
   final int IsRefund;
@@ -39,10 +41,12 @@ class InvoiceData {
     @required this.TodayVisitDate,
     @required this.ConsultationFee,
     @required this.Discount,
+    @required this.NetAmount,
     @required this.Disposibles,
     @required this.GrossAmount,
     @required this.IsRefund,
     @required this.RefundAmount,
+
   });
 
   factory InvoiceData.fromJson(Map<String, dynamic> json) {
@@ -53,6 +57,7 @@ class InvoiceData {
       TodayVisitDate: json['TodayVisitDate'],
       ConsultationFee: json['ConsultationFee'],
       Discount: json['Discount'],
+      NetAmount: json['NetAmount'],
       Disposibles: json['Disposibles'],
       GrossAmount: json['GrossAmount'],
       IsRefund: json['IsRefund'],
@@ -66,9 +71,13 @@ class InvoiceData {
         "TodayVisitDate": TodayVisitDate,
         "ConsultationFee": ConsultationFee,
         "Discount": Discount,
+        "NetAmount": NetAmount,
         "Disposibles": Disposibles,
         "GrossAmount": GrossAmount,
         "IsRefund": IsRefund,
         "RefundAmount": RefundAmount,
       };
 }
+
+
+

@@ -35,6 +35,8 @@ dependencies:
   responsive_table: ^0.1.1+8
   flutter_login: ^1.1.0
   simple_fontellico_progress_dialog: ^0.1.1
+  intl: ^0.16.1
+  timer_count_down: ^2.1.0+1
 
 dev_dependencies:
   flutter_test:
@@ -43,8 +45,10 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+
 # The following section is specific to Flutter.
 flutter:
+
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -1,3 +1,4 @@
+import 'package:baby_receptionist/Model/Appointment.dart';
 import 'package:flutter/foundation.dart';
 
 class Patient {
@@ -44,6 +45,7 @@ class PatientData {
   final String religion;
   final String patientGardian;
   final String paymentProfile;
+
 
   PatientData({
     this.id,

@@ -1,6 +1,8 @@
 import 'package:baby_receptionist/Pages/LoginScreen.dart';
 import 'package:baby_receptionist/Pages/NewInvoice.dart';
+import 'package:baby_receptionist/Pages/OnCallList.dart';
 import 'package:baby_receptionist/Pages/Refund.dart';
+import 'package:baby_receptionist/Pages/Shift.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_receptionist/Pages/Home.dart';
 import 'package:baby_receptionist/Pages/AddPatient.dart';
@@ -18,8 +20,10 @@ void main() {
       '/PatientList': (context) => PatientList(),
       '/NewInvoice': (context) => NewInvoice(),
       '/Refund': (context) => Refund(),
+      '/OnCallList': (context) => OnCallList(),
       '/LoginScreen': (context) => LoginScreen(),
       '/Home': (context) => Home(),
+      '/Shift': (context) => ShiftScreen(),
     },
   ));
 }

@@ -9,7 +9,7 @@ class ExpenseService {
 
   Future<List<Expense>> getExpenses() async {
     final response =
-    await http.get(Uri.https(Strings.pathAPI, 'api/expense'));
+    await http.get(Uri.https(Strings.pathAPI, 'api/Expense/get'));
     if (response.statusCode == 200) {
       final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
       return parsed.map<Expense>((json) => Expense.fromJson(json)).toList();
@@ -21,7 +21,7 @@ class ExpenseService {
 
   Future<Expense> getExpenseById(int Id) async {
     final response =
-    await http.get(Uri.https(Strings.pathAPI, 'api/Expense/${Id}'));
+    await http.get(Uri.https(Strings.pathAPI, 'api/Expense/get/${Id}'));
     if (response.statusCode == 200) {
       final JsonResponse= jsonDecode(response.body);
       return Expense.fromJson(JsonResponse);
@@ -35,7 +35,7 @@ class ExpenseService {
     //
     // };
     final response =
-    await http.post(Uri.https(Strings.pathAPI, 'api/Expense'),
+    await http.post(Uri.https(Strings.pathAPI, 'api/Expense/insert'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -47,9 +47,9 @@ class ExpenseService {
     }
   }
 
-  Future<bool> UpdateInvoice(Expense expense) async {
+  Future<bool> UpdateExpense(Expense expense) async {
     final response = await http.put(
-        Uri.https(Strings.pathAPI, 'api/Invoice/${expense.id}'),
+        Uri.https(Strings.pathAPI, 'api/Expense/update/${expense.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -63,7 +63,7 @@ class ExpenseService {
 
   Future<bool> DeleteExpense(int id) async {
     final response = await http.delete(
-        Uri.https(Strings.pathAPI, 'api/expense/${id}'),
+        Uri.https(Strings.pathAPI, 'api/expense/delete/${id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         });

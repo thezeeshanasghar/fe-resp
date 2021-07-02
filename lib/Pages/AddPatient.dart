@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:baby_receptionist/Design/Dimens.dart';
 import 'package:baby_receptionist/Design/Shade.dart';
+import 'package:baby_receptionist/Design/Strings.dart';
+import 'package:baby_receptionist/Model/Appointment.dart';
 import 'package:baby_receptionist/Model/Patient.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +55,7 @@ class _AddPatientState extends State<AddPatient> {
   int selectedRadioTile;
   int selectedRadio;
 
-  String PatientCategory = 'Visitor';
+  String PatientCategory = 'Walk In';
 
   @override
   void initState() {
@@ -79,6 +82,12 @@ class _AddPatientState extends State<AddPatient> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
+      appBar: AppBar(
+        title: Text(Strings.titleAddPatient),
+        centerTitle: false,
+        backgroundColor: Shade.globalAppBarColor,
+        elevation: 0.0,
+      ),
       body: DefaultTextStyle(
         style: Theme.of(context).textTheme.bodyText2,
         child: LayoutBuilder(
@@ -161,8 +170,8 @@ class _AddPatientState extends State<AddPatient> {
                     children: <Widget>[
                       Expanded(
                         child: RadioListTile(
-                          title: const Text('Visitor'),
-                          value: "Visitor",
+                          title: const Text('Walk In'),
+                          value: "WalkIn",
                           groupValue: PatientCategory,
                           onChanged: (String value) {
                             setState(() {
@@ -174,7 +183,7 @@ class _AddPatientState extends State<AddPatient> {
                       Expanded(
                         child: RadioListTile(
                           title: const Text('On Call'),
-                          value: "On Call",
+                          value: "OnCall",
                           groupValue: PatientCategory,
                           onChanged: (String value) {
                             setState(() {
@@ -710,7 +719,6 @@ class _AddPatientState extends State<AddPatient> {
       ],
     );
   }
-
   Widget widgetParentGuardian() {
     return Column(
       children: [
@@ -849,7 +857,8 @@ class _AddPatientState extends State<AddPatient> {
         referedDate: referedDate,
         religion: religion,
         patientGardian: patientGardian,
-        paymentProfile: paymentProfile);
+        paymentProfile: paymentProfile,
+       );
 
     var json = jsonEncode(patient.toJson());
     print(json);

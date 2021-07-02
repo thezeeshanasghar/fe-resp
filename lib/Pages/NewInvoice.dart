@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:baby_receptionist/Arguments/PatientArguments.dart';
 import 'package:baby_receptionist/Design/Shade.dart';
+import 'package:baby_receptionist/Design/Strings.dart';
+import 'package:baby_receptionist/Model/Appointment.dart';
 import 'package:baby_receptionist/Model/Invoice.dart';
 import 'package:baby_receptionist/Model/PatientInvoice.dart';
 import 'package:baby_receptionist/Service/InvoiceService.dart';
@@ -19,9 +21,9 @@ class _NewInvoiceState extends State<NewInvoice> {
   final lastVisitDateController = TextEditingController();
   final TodayVisitDateController = TextEditingController();
   final DateOfBirthController = TextEditingController();
-  DateTime lastVisit;
-  DateTime TodayVisit;
-  DateTime DateThree;
+  String PreviousVisitDate;
+  String TodayVisit;
+  String DateThree;
   String Invoices = "Select Invoice";
   String Name;
   String FatherName;
@@ -32,7 +34,7 @@ class _NewInvoiceState extends State<NewInvoice> {
   String Block;
   String DoctorName = 'Select Doctor';
   String DoctorType = 'Select Doctor Type';
-  int Fee;
+  int ConsultationFee;
   String PaymentType = "Select Payment Type";
   String ProcedureType = "Select Procedure Type";
   int Total;
@@ -41,6 +43,7 @@ class _NewInvoiceState extends State<NewInvoice> {
   int Disposable;
   int GrossTotal;
   PatientService patientService;
+  InvoiceService invoiceService = InvoiceService();
   bool isLoading = false;
   SimpleFontelicoProgressDialog _dialog;
   TextEditingController _namecontroller;
@@ -53,11 +56,14 @@ class _NewInvoiceState extends State<NewInvoice> {
   bool hasRun = false;
   PatientArguments args;
   int PatientId;
+  String Patient;
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
   }
 
   @override
@@ -79,7 +85,7 @@ class _NewInvoiceState extends State<NewInvoice> {
     patientService = PatientService();
     PatientSingleInvoice resp = await patientService.getPatientInvoiceById(Id);
     setState(() {
-      print(resp);
+      print(resp.data.toJson());
       _namecontroller.text = resp.data.name;
       _fatherhusbandnamecontroller.text = resp.data.fatherHusbandName;
       DateOfBirthController.text = resp.data.dob.substring(0, 10);
@@ -109,7 +115,7 @@ class _NewInvoiceState extends State<NewInvoice> {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text("New Invoice"),
+        title: Text(Strings.titleAddInvoice),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
@@ -152,29 +158,6 @@ class _NewInvoiceState extends State<NewInvoice> {
           },
         ),
       ),
-    );
-  }
-
-  Widget widgetSubmit() {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.center,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(8, 10, 8, 10),
-            child: ElevatedButton(
-              autofocus: false,
-              style: ElevatedButton.styleFrom(
-                primary: Shade.submitButtonColor,
-                minimumSize: Size(double.infinity, 45),
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              ),
-              child: Text('Submit'),
-              onPressed: () {},
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -341,7 +324,7 @@ class _NewInvoiceState extends State<NewInvoice> {
   Widget widgetRowEight() {
     return Row(
       children: [
-        Expanded(child: widgetFee()),
+        Expanded(child: widgetConsultationFee()),
         Expanded(child: widgetPaymentType()),
         Expanded(child: widgetProcedureType()),
       ],
@@ -422,7 +405,7 @@ class _NewInvoiceState extends State<NewInvoice> {
     );
   }
 
-  Widget widgetFee() {
+  Widget widgetConsultationFee() {
     return Column(
       children: [
         Padding(
@@ -447,7 +430,7 @@ class _NewInvoiceState extends State<NewInvoice> {
                 return null;
               },
               onSaved: (String value) {
-                Fee = int.parse(value);
+                ConsultationFee = int.parse(value);
               }),
         ),
       ],
@@ -799,7 +782,7 @@ class _NewInvoiceState extends State<NewInvoice> {
               }
             },
             onSaved: (String value) {
-              lastVisit = DateTime.parse(value);
+              PreviousVisitDate = value;
             },
             onTap: () {
               pickDateOne();
@@ -829,7 +812,7 @@ class _NewInvoiceState extends State<NewInvoice> {
               }
             },
             onSaved: (String value) {
-              TodayVisit = DateTime.parse(value);
+              TodayVisit = value;
             },
             onTap: () {
               pickDateTwo();
@@ -859,7 +842,7 @@ class _NewInvoiceState extends State<NewInvoice> {
               }
             },
             onSaved: (String value) {
-              DateThree = DateTime.parse(value);
+              DateThree = value;
             },
             onTap: () {
               pickDateThree();
@@ -916,7 +899,7 @@ class _NewInvoiceState extends State<NewInvoice> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        lastVisit = date;
+        PreviousVisitDate = date.toString();
         lastVisitDateController.text = date.toString();
       });
     }
@@ -930,7 +913,7 @@ class _NewInvoiceState extends State<NewInvoice> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        TodayVisit = date;
+        TodayVisit = date.toString();
         TodayVisitDateController.text = date.toString().substring(0, 10);
       });
     }
@@ -944,8 +927,105 @@ class _NewInvoiceState extends State<NewInvoice> {
         lastDate: DateTime.now());
     if (date != null) {
       setState(() {
-        DateThree = date;
+        DateThree = date.toString();
         DateOfBirthController.text = date.toString();
+      });
+    }
+  }
+
+  Widget widgetSubmit() {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.center,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(8, 10, 8, 10),
+            child: ElevatedButton(
+              autofocus: false,
+              style: ElevatedButton.styleFrom(
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              ),
+              child: Text('Submit'),
+              onPressed: () {
+                onPressedSubmitButton();
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  onPressedSubmitButton() async {
+    // print(qualificationList);
+    // print(diplomaList);
+    List<dynamic> degrees = [];
+    if (!formKey.currentState.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Text('Error: Some input fields are not filled')));
+      return;
+    }
+    setState(() {
+      loadingButtonProgressIndicator = true;
+    });
+    formKey.currentState.save();
+
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,
+        width: MediaQuery.of(context).size.width - 50);
+
+    InvoiceData invoiceData = new InvoiceData(
+      PaymentType: PaymentType,
+      PreviousVisitDate: PreviousVisitDate,
+      TodayVisitDate: TodayVisit,
+      ConsultationFee: ConsultationFee,
+      NetAmount: NetTotal,
+      Disposibles: Disposable,
+      GrossAmount: GrossTotal,
+      IsRefund: 0,
+      RefundAmount: 0,
+      Discount: Discount,
+    );
+    var response = await invoiceService.InsertInvoice(invoiceData);
+    print(response);
+    if (response == true) {
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
+      _dialog.hide();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalSuccess,
+          content: Row(
+            children: [
+              Text('Success: Created Invoice '),
+              Text(
+                Name,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      formKey.currentState.reset();
+
+      // Navigator.pushNamed(context, Strings.routeNurseList);
+    } else {
+      _dialog.hide();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Row(
+            children: [
+              Text('Error: Try Again: Failed to add '),
+              Text(
+                Name,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      setState(() {
+        loadingButtonProgressIndicator = false;
       });
     }
   }

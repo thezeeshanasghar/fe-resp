@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:baby_receptionist/Design/Strings.dart';
 import 'package:baby_receptionist/Model/Patient.dart';
 import 'package:baby_receptionist/Model/PatientInvoice.dart';
 
@@ -17,8 +18,9 @@ class PatientService {
   }
 
   Future<PatientInvoice> getPatientInvoice() async {
-    final response = await http
-        .get(Uri.https('babymedics.fernflowers.com', 'api/Patient/Invoices'));
+    final response =  await http
+        .get(Uri.https(Strings.pathAPI, 'api/Patient/Invoices'));
+
     if (response.statusCode == 200) {
       final jsonReponse = jsonDecode(response.body);
       return PatientInvoice.fromJson(jsonReponse);
@@ -29,7 +31,7 @@ class PatientService {
 
   Future<PatientSingleInvoice> getPatientInvoiceById(int Id) async {
     final response = await http.get(Uri.https(
-        'babymedics.fernflowers.com', 'api/Patient/Invoices/get/${Id}'));
+        Strings.pathAPI, 'api/Patient/Invoices/get/${Id}'));
     if (response.statusCode == 200) {
       final JsonResponse = jsonDecode(response.body);
       return PatientSingleInvoice.fromJson(JsonResponse);
@@ -65,7 +67,7 @@ class PatientService {
       "paymentProfile": patients.paymentProfile,
     };
     final response = await http.post(
-        Uri.https('babymedics.fernflowers.com', 'api/Patient/Insert'),
+        Uri.https(Strings.pathAPI, 'api/Patient/Insert/${patients.patientCategory}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -79,7 +81,7 @@ class PatientService {
 
   Future<bool> UpdatePatient(PatientData patients) async {
     final response = await http.put(
-        Uri.https('babymedics.fernflowers.com', 'api/Patient/${patients.id}'),
+        Uri.https(Strings.pathAPI, 'api/Patient/update/${patients.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -93,7 +95,7 @@ class PatientService {
 
   Future<bool> DeletePatient(int id) async {
     final response = await http.delete(
-        Uri.https('babymedics.fernflowers.com', 'api/Patient/${id}'),
+        Uri.https(Strings.pathAPI, 'api/Patient/delete/${id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         });

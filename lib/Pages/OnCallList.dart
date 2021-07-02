@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:baby_receptionist/Design/Dimens.dart';
 import 'package:baby_receptionist/Design/Shade.dart';
+import 'package:baby_receptionist/Design/Strings.dart';
 import 'package:baby_receptionist/Pages/NewInvoice.dart';
 import 'package:baby_receptionist/Pages/Refund.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +49,12 @@ class _OnCallListState extends State<OnCallList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
+      appBar: AppBar(
+        title: Text(Strings.titleOnCallList),
+        centerTitle: false,
+        backgroundColor: Shade.globalAppBarColor,
+        elevation: 0.0,
+      ),
       body: DefaultTextStyle(
         style: Theme.of(context).textTheme.bodyText2,
         child: LayoutBuilder(

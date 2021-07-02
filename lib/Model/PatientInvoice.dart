@@ -1,3 +1,4 @@
+import 'package:baby_receptionist/Design/Strings.dart';
 import 'package:flutter/foundation.dart';
 
 class PatientInvoice {
@@ -53,7 +54,7 @@ class PatientInvoiceData {
   final String category;
   final String lastAppointmentDate;
   final int discount;
-  final String appointmentId;
+  final int appointmentId;
   final int netAmount;
 
   PatientInvoiceData({
@@ -70,8 +71,8 @@ class PatientInvoiceData {
     @required this.sex,
     @required this.lastAppointmentDate,
     @required this.discount,
-    @required this.appointmentId,
     @required this.netAmount,
+    this.appointmentId,
   });
 
   factory PatientInvoiceData.fromJson(Map<String, dynamic> json) {

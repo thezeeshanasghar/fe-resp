@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:baby_receptionist/Arguments/PatientArguments.dart';
+import 'package:baby_receptionist/Design/Shade.dart';
 import 'package:baby_receptionist/Design/Strings.dart';
 import 'package:baby_receptionist/Model/PatientInvoice.dart';
 import 'package:baby_receptionist/Pages/NewInvoice.dart';
@@ -59,6 +60,7 @@ class _PatientListState extends State<PatientList> {
   bool onlineSortAscending = true;
   bool onlineIsLoading = true;
   bool onlineShowSelect = false;
+  PatientInvoice listOnlines;
 
   // Admitted Data
   List<DatatableHeader> admittedHeaders = [];
@@ -108,6 +110,24 @@ class _PatientListState extends State<PatientList> {
   //
   // }
 
+  void initOnlineVariablesAndClasses() {
+    onlineHeaders = [];
+    onlinePerPage = [5, 10, 15, 100];
+    onlineTotal = 100;
+    onlineCurrentPerPage;
+    onlineCurrentPage = 1;
+    onlineIsSearch = false;
+    onlineIsSource = [];
+    onlineSelecteds = [];
+    onlineSelectableKey = "Invoice";
+    onlineSortColumn;
+    onlineSortAscending = true;
+    onlineIsLoading = true;
+    onlineShowSelect = false;
+
+    patientService = PatientService();
+  }
+
   void initWalkInVariablesAndClasses() {
     walkInHeaders = [];
     walkInPerPage = [5, 10, 15, 100];
@@ -126,7 +146,7 @@ class _PatientListState extends State<PatientList> {
     patientService = PatientService();
   }
 
-  void getPatientsFromApiAndLinkToTable() async {
+  void getWalkInFromApiAndLinkToTable() async {
     setState(() => walkInIsLoading = true);
 
     walkInIsSource = [];
@@ -135,19 +155,48 @@ class _PatientListState extends State<PatientList> {
     setState(() => walkInIsLoading = false);
   }
 
-  List<Map<String, dynamic>> generatewalkInDataFromApi(
-      List<PatientInvoiceData> listWalkIns) {
+  List<Map<String, dynamic>> generatewalkInDataFromApi(List<PatientInvoiceData> listWalkIns) {
     List<Map<String, dynamic>> tempswalkIn = [];
     for (PatientInvoiceData patients in listWalkIns) {
       tempswalkIn.add({
         "Invoice": patients.id,
         "Name": patients.name,
         "FatherName": patients.fatherHusbandName,
-        "DOB": "patients.dob",
+        "Total": patients.netAmount - patients.discount,
+        "Discount": patients.discount,
+        "NetTotal": patients.netAmount,
         "Action": patients.patientId,
       });
     }
     return tempswalkIn;
+  }
+
+
+  void getOnlineFromApiAndLinkToTable() async {
+    setState(() => onlineIsLoading = true);
+
+    onlineIsSource = [];
+    listOnlines = await patientService.getPatientInvoice();
+    onlineIsSource.addAll(generateOnlineDataFromApi(listOnlines.data));
+    setState(() => onlineIsLoading = false);
+  }
+
+  List<Map<String, dynamic>> generateOnlineDataFromApi(List<PatientInvoiceData> listOnlines) {
+    List<Map<String, dynamic>> tempsOnline = [];
+    for (PatientInvoiceData patients in listOnlines) {
+      tempsOnline.add({
+        "Invoice": patients.id,
+        "PatientName": patients.name,
+        "FatherName": patients.fatherHusbandName,
+        "DOB": patients.dob.substring(0,10),
+        "Contact": patients.contact,
+        "Total": patients.netAmount - patients.discount,
+        "Discount": patients.discount,
+        "NetTotal": patients.netAmount,
+        "Action": patients.patientId,
+      });
+    }
+    return tempsOnline;
   }
 
   initializeWalkInHeaders() {
@@ -391,7 +440,7 @@ class _PatientListState extends State<PatientList> {
   initializeOnlineHeaders() {
     onlineHeaders = [
       DatatableHeader(
-          value: "Date",
+          value: "Invoice",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -400,7 +449,7 @@ class _PatientListState extends State<PatientList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Date",
+                  "Invoice",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -721,11 +770,13 @@ class _PatientListState extends State<PatientList> {
     // walk in
     initWalkInVariablesAndClasses();
     initializeWalkInHeaders();
-    getPatientsFromApiAndLinkToTable();
+    getWalkInFromApiAndLinkToTable();
 
     // online
+    initOnlineVariablesAndClasses();
     initializeOnlineHeaders();
-    onlineInitData();
+    getOnlineFromApiAndLinkToTable();
+
 
     // admitted
     initializeAdmittedHeaders();
@@ -741,6 +792,12 @@ class _PatientListState extends State<PatientList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: Text(Strings.titlePatientList),
+        centerTitle: false,
+        backgroundColor: Shade.globalAppBarColor,
+        elevation: 0.0,
+      ),
       body: DefaultTextStyle(
         style: Theme.of(context).textTheme.bodyText2,
         child: LayoutBuilder(

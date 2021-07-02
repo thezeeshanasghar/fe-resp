@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:baby_receptionist/Design/Dimens.dart';
 import 'package:baby_receptionist/Design/Shade.dart';
+import 'package:baby_receptionist/Design/Strings.dart';
 import 'package:baby_receptionist/Model/Expense.dart';
 import 'package:baby_receptionist/Pages/NewInvoice.dart';
 import 'package:baby_receptionist/Pages/Refund.dart';
@@ -53,6 +54,12 @@ class _ExpenseListState extends State<ExpenseList> {
     expenseService = ExpenseService();
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
+      appBar: AppBar(
+        title: Text(Strings.titleExpenseList),
+        centerTitle: false,
+        backgroundColor: Shade.globalAppBarColor,
+        elevation: 0.0,
+      ),
       body: DefaultTextStyle(
         style: Theme.of(context).textTheme.bodyText2,
         child: LayoutBuilder(
