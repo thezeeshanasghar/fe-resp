@@ -16,11 +16,11 @@ class NewExpense extends StatefulWidget {
 
 class _NewExpenseState extends State<NewExpense> {
   final NewExpenseKey = GlobalKey<FormState>();
-  String BillType;
-  String PaymentType;
+  String BillType = 'Select Final Bill';
+  String PaymentType ='Payment Option';
   String VoucherNo;
-  String FinalBill = 'Select Final Bill';
-  String CashPayment = 'Payment Option';
+  String FinalBill;
+  String CashPayment ;
   String EmployeeOrVendor='Employee or Vendor';
   String VoucherNumber;
   String ExpenseCategory='Choose Expense Category';
@@ -102,11 +102,11 @@ class _NewExpenseState extends State<NewExpense> {
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: DropdownButtonFormField<String>(
             isExpanded: true,
-            value: FinalBill,
+            value: BillType,
             elevation: 16,
             onChanged: (String newValue) {
               setState(() {
-                FinalBill = newValue;
+                BillType = newValue;
               });
             },
             items: <String>[
@@ -136,11 +136,11 @@ class _NewExpenseState extends State<NewExpense> {
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: DropdownButtonFormField<String>(
             isExpanded: true,
-            value: CashPayment,
+            value: PaymentType,
             elevation: 16,
             onChanged: (String newValue) {
               setState(() {
-                CashPayment = newValue;
+                PaymentType = newValue;
               });
             },
             items: <String>[
@@ -173,14 +173,14 @@ class _NewExpenseState extends State<NewExpense> {
                 border: OutlineInputBorder(),
                 labelText: 'Voucher Number'),
             validator: (String value) {
-              int _VoucherNumber = int.tryParse(value);
+              int VoucherNo = int.tryParse(value);
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
               return null;
             },
             onSaved: (String value) {
-              VoucherNumber = value;
+              VoucherNo = value;
             },
           ),
         ),
@@ -423,7 +423,7 @@ class _NewExpenseState extends State<NewExpense> {
         message: 'Loading...',
         type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
-    Expense expense = new Expense(
+    PatientExpense expense = new PatientExpense(
         BillType: BillType,
         PaymentType: PaymentType,
         EmployeeOrVender: EmployeeOrVendor,
@@ -433,7 +433,7 @@ class _NewExpenseState extends State<NewExpense> {
         TotalBill: TotalBill,
         TransactionDetail: TransactionDetails,
         );
-
+ 
     var json = jsonEncode(expense.toJson());
     print(json);
 

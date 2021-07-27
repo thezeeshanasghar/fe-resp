@@ -3,8 +3,10 @@ import 'dart:math';
 import 'package:baby_receptionist/Design/Dimens.dart';
 import 'package:baby_receptionist/Design/Shade.dart';
 import 'package:baby_receptionist/Design/Strings.dart';
+import 'package:baby_receptionist/Model/PatientInvoice.dart';
 import 'package:baby_receptionist/Pages/NewInvoice.dart';
 import 'package:baby_receptionist/Pages/Refund.dart';
+import 'package:baby_receptionist/Service/PatientService.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
@@ -31,15 +33,63 @@ class _OnCallListState extends State<OnCallList> {
   bool onCallSortAscending = true;
   bool onCallIsLoading = true;
   bool onCallShowSelect = false;
+  PatientInvoice listOnCall;
+  PatientService patientService;
 
   @override
   void initState() {
     super.initState();
     // onCall
+    initonCallVariablesAndClasses();
     initializeonCallHeaders();
-    onCallInitData();
+    getonCallFromApiAndLinkToTable();
   }
 
+  void getonCallFromApiAndLinkToTable() async {
+    setState(() => onCallIsLoading = true);
+    onCallIsSource = [];
+    var listOnCall = [];
+    PatientInvoice patientResponse = await patientService.getPatientInvoice('OnCall');
+    listOnCall = patientResponse.data;
+    print(patientResponse.data);
+    onCallIsSource.addAll(generateOnCallDataFromApi(listOnCall));
+    setState(() => onCallIsLoading = false);
+  }
+  List<Map<String, dynamic>> generateOnCallDataFromApi(List<PatientInvoiceData> listOnCall) {
+    List<Map<String, dynamic>> tempsOnCall = [];
+    for (PatientInvoiceData patients in listOnCall) {
+      tempsOnCall.add({
+        "Invoice": patients.id,
+        "Name": patients.name,
+        "FatherName": patients.fatherHusbandName,
+        "DOB": patients.dob.substring(0,10),
+        "CheckupType": patients.category,
+        "Total": patients.netAmount - patients.discount,
+        "Discount": patients.discount,
+        "NetTotal": patients.netAmount,
+        "Action": patients.patientId,
+      });
+    }
+    return tempsOnCall;
+  }
+
+  void initonCallVariablesAndClasses() {
+    onCallHeaders = [];
+    onCallPerPage = [5, 10, 15, 100];
+    onCallTotal = 100;
+    onCallCurrentPerPage;
+    onCallCurrentPage = 1;
+    onCallIsSearch = false;
+    onCallIsSource = [];
+    onCallSelecteds = [];
+    onCallSelectableKey = "Invoice";
+    onCallSortColumn;
+    onCallSortAscending = true;
+    onCallIsLoading = true;
+    onCallShowSelect = false;
+
+    patientService = PatientService();
+  }
   @override
   void dispose() {
     super.dispose();
@@ -417,39 +467,11 @@ class _OnCallListState extends State<OnCallList> {
     );
   }
 
-  // onCall
-  List<Map<String, dynamic>> onCallGenerateData({int n: 100}) {
-    final List sourceonCall = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> tempsonCall = [];
-    var i = onCallIsSource.length;
-    print(i);
-    for (var data in sourceonCall) {
-      tempsonCall.add({
-        "Date": "Feb 24, 2021",
-        "PatientName": "Syed Basit Ali Shah $i",
-        "FatherName": "Syed Basit Ali Shah $i",
-        "DOB": "Jan 19, 1994",
-        "CheckupType": "Pediatrician",
-        "BookingNo": "GH-0167$i",
-        "Action": [i, 100],
-      });
-      i++;
-    }
-    return tempsonCall;
-  }
-
-  onCallInitData() async {
-    setState(() => onCallIsLoading = true);
-    Future.delayed(Duration(seconds: 0)).then((value) {
-      onCallIsSource.addAll(onCallGenerateData(n: 100));
-      setState(() => onCallIsLoading = false);
-    });
-  }
 
   initializeonCallHeaders() {
     onCallHeaders = [
       DatatableHeader(
-          value: "Date",
+          value: "Invoice",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -458,14 +480,14 @@ class _OnCallListState extends State<OnCallList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Date",
+                  "Invoice",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "PatientName",
+          value: "Name",
           show: true,
           flex: 2,
           sortable: true,

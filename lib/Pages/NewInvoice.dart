@@ -4,8 +4,10 @@ import 'package:baby_receptionist/Arguments/PatientArguments.dart';
 import 'package:baby_receptionist/Design/Shade.dart';
 import 'package:baby_receptionist/Design/Strings.dart';
 import 'package:baby_receptionist/Model/Appointment.dart';
+import 'package:baby_receptionist/Model/Doctor.dart';
 import 'package:baby_receptionist/Model/Invoice.dart';
 import 'package:baby_receptionist/Model/PatientInvoice.dart';
+import 'package:baby_receptionist/Service/DoctorService.dart';
 import 'package:baby_receptionist/Service/InvoiceService.dart';
 import 'package:baby_receptionist/Service/PatientService.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +45,7 @@ class _NewInvoiceState extends State<NewInvoice> {
   int Disposable;
   int GrossTotal;
   PatientService patientService;
+  DoctorService doctorService;
   InvoiceService invoiceService = InvoiceService();
   bool isLoading = false;
   SimpleFontelicoProgressDialog _dialog;
@@ -56,12 +59,14 @@ class _NewInvoiceState extends State<NewInvoice> {
   bool hasRun = false;
   PatientArguments args;
   int PatientId;
+  List<DoctorData> listDoctors;
   String Patient;
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
+
     _dialog = SimpleFontelicoProgressDialog(
         context: context, barrierDimisable: false);
   }
@@ -77,8 +82,19 @@ class _NewInvoiceState extends State<NewInvoice> {
       args = ModalRoute.of(context).settings.arguments;
       PatientId = args.Id;
       getPatientData(PatientId);
+      getDoctorsData();
       hasRun = true;
     }
+  }
+  void getDoctorsData() async {
+  doctorService =DoctorService();
+  var listAdmitted = [];
+  Doctor resp=await doctorService.getDoctor();
+  listDoctors=resp.data;
+  setState(() {
+    print(resp.data[0].employee.emergencyContact);
+    print("ANEES");
+  });
   }
 
   void getPatientData(int Id) async {

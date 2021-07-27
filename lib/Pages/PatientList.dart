@@ -77,87 +77,190 @@ class _PatientListState extends State<PatientList> {
   bool admittedIsLoading = true;
   bool admittedShowSelect = false;
 
-  // walk in
-  // List<Map<String, dynamic>> walkInGenerateData({int n: 100}) {
-  //   final List source = List.filled(n, Random.secure());
-  //   List<Map<String, dynamic>> temps = [];
-  //   var i = walkInIsSource.length;
-  //   print(i);
-  //   for (var data in source) {
-  //     temps.add({
-  //       "Invoice": i + 1000,
-  //       "Date": "Feb 24, 2021",
-  //       "Name": "Syed Basit Ali Shah $i",
-  //       "FatherName": "Father-$i",
-  //       "DOB": "Jan 18, 1994",
-  //       "Total": "Rs. 20",
-  //       "Discount": "Rs. 1$i",
-  //       "NetTotal": "Rs. 5$i",
-  //       "Refund": "Rs. 0",
-  //       "NewInvoice": [i, 100],
-  //     });
-  //     i++;
-  //   }
-  //   return temps;
-  // }
 
-  // walkInInitData() async {
-  //   setState(() => walkInIsLoading = true);
-  //   Future.delayed(Duration(seconds: 0)).then((value) {
-  //     walkInIsSource.addAll(walkInGenerateData(n: 100));
-  //     setState(() => walkInIsLoading = false);
-  //   });
-  //
-  // }
 
-  void initOnlineVariablesAndClasses() {
-    onlineHeaders = [];
-    onlinePerPage = [5, 10, 15, 100];
-    onlineTotal = 100;
-    onlineCurrentPerPage;
-    onlineCurrentPage = 1;
-    onlineIsSearch = false;
-    onlineIsSource = [];
-    onlineSelecteds = [];
-    onlineSelectableKey = "Invoice";
-    onlineSortColumn;
-    onlineSortAscending = true;
-    onlineIsLoading = true;
-    onlineShowSelect = false;
+
+  // admitted
+  void initAdmittedVariablesAndClasses() {
+    admittedHeaders = [];
+    admittedPerPage = [5, 10, 15, 100];
+    admittedTotal = 100;
+    admittedCurrentPerPage;
+    admittedCurrentPage = 1;
+    admittedIsSearch = false;
+    admittedIsSource = [];
+    admittedSelecteds = [];
+    admittedSelectableKey = "Invoice";
+    admittedSortColumn;
+    admittedSortAscending = true;
+    admittedIsLoading = true;
+    admittedShowSelect = false;
 
     patientService = PatientService();
   }
 
-  void initWalkInVariablesAndClasses() {
-    walkInHeaders = [];
-    walkInPerPage = [5, 10, 15, 100];
-    walkInTotal = 100;
-    walkInCurrentPerPage;
-    walkInCurrentPage = 1;
-    walkInIsSearch = false;
-    walkInIsSource = [];
-    walkInSelecteds = [];
-    walkInSelectableKey = "Invoice";
-    walkInSortColumn;
-    walkInSortAscending = true;
-    walkInIsLoading = true;
-    walkInShowSelect = false;
-
-    patientService = PatientService();
+  void gettAdmittedFromApiAndLinkToTable() async {
+    setState(() => admittedIsLoading = true);
+    admittedIsSource = [];
+    var listAdmitted = [];
+    PatientInvoice patientResponse = await patientService.getPatientInvoice('admitted');
+    listAdmitted = patientResponse.data;
+    admittedIsSource.addAll(generateOnlineDataFromApi(listAdmitted));
+    setState(() => admittedIsLoading = false);
   }
 
-  void getWalkInFromApiAndLinkToTable() async {
-    setState(() => walkInIsLoading = true);
-
-    walkInIsSource = [];
-    listWalkIns = await patientService.getPatientInvoice();
-    walkInIsSource.addAll(generatewalkInDataFromApi(listWalkIns.data));
-    setState(() => walkInIsLoading = false);
+  initializeAdmittedHeaders() {
+    admittedHeaders = [
+      DatatableHeader(
+          value: "Date",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Date",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "PatientName",
+          show: true,
+          flex: 2,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Patient Name",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "FatherName",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Father Name",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "DOB",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "DOB",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "CheckupType",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Checkup Type",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "BookingNo",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Booking No",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "Action",
+          show: true,
+          flex: 2,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Action",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          },
+          sourceBuilder: (value, row) {
+            return Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => NewInvoice()),
+                          );
+                        },
+                        child: Text('New Invoice')),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Refund()),
+                          );
+                        },
+                        child: Text(
+                          'Refund',
+                          style: TextStyle(color: Colors.red),
+                        )),
+                  ],
+                ));
+          }),
+    ];
   }
 
-  List<Map<String, dynamic>> generatewalkInDataFromApi(List<PatientInvoiceData> listWalkIns) {
+  List<Map<String, dynamic>> generateadmittedDataFromApi(List<PatientInvoiceData> listAdmitted) {
     List<Map<String, dynamic>> tempswalkIn = [];
-    for (PatientInvoiceData patients in listWalkIns) {
+    for (PatientInvoiceData patients in listAdmitted) {
       tempswalkIn.add({
         "Invoice": patients.id,
         "Name": patients.name,
@@ -171,34 +274,7 @@ class _PatientListState extends State<PatientList> {
     return tempswalkIn;
   }
 
-
-  void getOnlineFromApiAndLinkToTable() async {
-    setState(() => onlineIsLoading = true);
-
-    onlineIsSource = [];
-    listOnlines = await patientService.getPatientInvoice();
-    onlineIsSource.addAll(generateOnlineDataFromApi(listOnlines.data));
-    setState(() => onlineIsLoading = false);
-  }
-
-  List<Map<String, dynamic>> generateOnlineDataFromApi(List<PatientInvoiceData> listOnlines) {
-    List<Map<String, dynamic>> tempsOnline = [];
-    for (PatientInvoiceData patients in listOnlines) {
-      tempsOnline.add({
-        "Invoice": patients.id,
-        "PatientName": patients.name,
-        "FatherName": patients.fatherHusbandName,
-        "DOB": patients.dob.substring(0,10),
-        "Contact": patients.contact,
-        "Total": patients.netAmount - patients.discount,
-        "Discount": patients.discount,
-        "NetTotal": patients.netAmount,
-        "Action": patients.patientId,
-      });
-    }
-    return tempsOnline;
-  }
-
+  // Walkin
   initializeWalkInHeaders() {
     walkInHeaders = [
       DatatableHeader(
@@ -407,36 +483,75 @@ class _PatientListState extends State<PatientList> {
           }),
     ];
   }
+  void initWalkInVariablesAndClasses() {
+    walkInHeaders = [];
+    walkInPerPage = [5, 10, 15, 100];
+    walkInTotal = 100;
+    walkInCurrentPerPage;
+    walkInCurrentPage = 1;
+    walkInIsSearch = false;
+    walkInIsSource = [];
+    walkInSelecteds = [];
+    walkInSelectableKey = "Invoice";
+    walkInSortColumn;
+    walkInSortAscending = true;
+    walkInIsLoading = true;
+    walkInShowSelect = false;
 
-  // online
-  List<Map<String, dynamic>> onlineGenerateData({int n: 100}) {
-    final List sourceOnline = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> tempsOnline = [];
-    var i = onlineIsSource.length;
-    print(i);
-    for (var data in sourceOnline) {
-      tempsOnline.add({
-        "Date": "Feb 24, 2021",
-        "PatientName": "Syed Basit Ali Shah $i",
-        "FatherName": "Syed Basit Ali Shah $i",
-        "DOB": "Jan 19, 1994",
-        "CheckupType": "Pediatrician",
-        "BookingNo": "GH-0167$i",
-        "Action": [i, 100],
+    patientService = PatientService();
+  }
+  void getWalkInFromApiAndLinkToTable() async {
+    setState(() => walkInIsLoading = true);
+    walkInIsSource = [];
+    var listWalkIns = [];
+    PatientInvoice patientResponse = await patientService.getPatientInvoice('walkin');
+    listWalkIns = patientResponse.data;
+    walkInIsSource.addAll(generatewalkInDataFromApi(listWalkIns));
+    setState(() => walkInIsLoading = false);
+  }
+  List<Map<String, dynamic>> generatewalkInDataFromApi(List<PatientInvoiceData> listWalkIns) {
+    List<Map<String, dynamic>> tempswalkIn = [];
+    for (PatientInvoiceData patients in listWalkIns) {
+      tempswalkIn.add({
+        "Invoice": patients.id,
+        "Name": patients.name,
+        "FatherName": patients.fatherHusbandName,
+        "Total": patients.netAmount - patients.discount,
+        "Discount": patients.discount,
+        "NetTotal": patients.netAmount,
+        "Action": patients.patientId,
       });
-      i++;
     }
-    return tempsOnline;
+    return tempswalkIn;
   }
 
-  onlineInitData() async {
+  // Oncall
+  void initOnlineVariablesAndClasses() {
+    onlineHeaders = [];
+    onlinePerPage = [5, 10, 15, 100];
+    onlineTotal = 100;
+    onlineCurrentPerPage;
+    onlineCurrentPage = 1;
+    onlineIsSearch = false;
+    onlineIsSource = [];
+    onlineSelecteds = [];
+    onlineSelectableKey = "Invoice";
+    onlineSortColumn;
+    onlineSortAscending = true;
+    onlineIsLoading = true;
+    onlineShowSelect = false;
+
+    patientService = PatientService();
+  }
+  void getOnlineFromApiAndLinkToTable() async {
     setState(() => onlineIsLoading = true);
-    Future.delayed(Duration(seconds: 0)).then((value) {
-      onlineIsSource.addAll(onlineGenerateData(n: 100));
-      setState(() => onlineIsLoading = false);
-    });
+    onlineIsSource = [];
+    var listOnlines = [];
+    PatientInvoice patientResponse = await patientService.getPatientInvoice('Online');
+    listOnlines = patientResponse.data;
+    onlineIsSource.addAll(generateOnlineDataFromApi(listOnlines));
+    setState(() => onlineIsLoading = false);
   }
-
   initializeOnlineHeaders() {
     onlineHeaders = [
       DatatableHeader(
@@ -522,7 +637,7 @@ class _PatientListState extends State<PatientList> {
           }),
       DatatableHeader(
           value: "BookingNo",
-          show: true,
+          show: false,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -556,213 +671,53 @@ class _PatientListState extends State<PatientList> {
           sourceBuilder: (Id, row) {
             return Container(
                 child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                    onPressed: () {
-                      print(Id);
-                      Navigator.pushNamed(context, Strings.routeNewInvoice,
-                          arguments: PatientArguments(Id: Id));
-                    },
-                    child: Text('New Invoice')),
-                SizedBox(
-                  width: 10,
-                ),
-                TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Refund()),
-                      );
-                    },
-                    child: Text(
-                      'Refund',
-                      style: TextStyle(color: Colors.red),
-                    )),
-              ],
-            ));
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          print(Id);
+                          Navigator.pushNamed(context, Strings.routeNewInvoice,
+                              arguments: PatientArguments(Id: Id));
+                        },
+                        child: Text('New Invoice')),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Refund()),
+                          );
+                        },
+                        child: Text(
+                          'Refund',
+                          style: TextStyle(color: Colors.red),
+                        )),
+                  ],
+                ));
           }),
     ];
   }
-
-  // admitted
-  List<Map<String, dynamic>> admittedGenerateData({int n: 100}) {
-    final List sourceAdmitted = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> tempsAdmitted = [];
-    var i = admittedIsSource.length;
-    print(i);
-    for (var data in sourceAdmitted) {
-      tempsAdmitted.add({
-        "Date": "Feb 24, 2021",
-        "PatientName": "Syed Basit Ali Shah $i",
-        "FatherName": "Syed Basit Ali Shah $i",
-        "DOB": "Jan 19, 1994",
-        "CheckupType": "Pediatrician",
-        "BookingNo": "GH-0167$i",
-        "Action": [i, 100],
+  List<Map<String, dynamic>> generateOnlineDataFromApi(List<PatientInvoiceData> listOnlines) {
+    List<Map<String, dynamic>> tempsOnline = [];
+    for (PatientInvoiceData patients in listOnlines) {
+      tempsOnline.add({
+        "Invoice": patients.id,
+        "PatientName": patients.name,
+        "FatherName": patients.fatherHusbandName,
+        "DOB": patients.dob.substring(0,10),
+        "Contact": patients.contact,
+        "CheckupType": patients.category,
+        "Total": patients.netAmount - patients.discount,
+        "Discount": patients.discount,
+        "NetTotal": patients.netAmount,
+        "Action": patients.patientId,
       });
-      i++;
     }
-    return tempsAdmitted;
+    return tempsOnline;
   }
-
-  admittedInitData() async {
-    setState(() => admittedIsLoading = true);
-    Future.delayed(Duration(seconds: 0)).then((value) {
-      admittedIsSource.addAll(onlineGenerateData(n: 100));
-      setState(() => admittedIsLoading = false);
-    });
-  }
-
-  initializeAdmittedHeaders() {
-    admittedHeaders = [
-      DatatableHeader(
-          value: "Date",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Date",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "PatientName",
-          show: true,
-          flex: 2,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Patient Name",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "FatherName",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Father Name",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "DOB",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "DOB",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "CheckupType",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Checkup Type",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "BookingNo",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Booking No",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "Action",
-          show: true,
-          flex: 2,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Action",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          },
-          sourceBuilder: (value, row) {
-            return Container(
-                child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => NewInvoice()),
-                      );
-                    },
-                    child: Text('New Invoice')),
-                SizedBox(
-                  width: 10,
-                ),
-                TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Refund()),
-                      );
-                    },
-                    child: Text(
-                      'Refund',
-                      style: TextStyle(color: Colors.red),
-                    )),
-              ],
-            ));
-          }),
-    ];
-  }
-
+  
   @override
   void initState() {
     super.initState();
@@ -780,7 +735,9 @@ class _PatientListState extends State<PatientList> {
 
     // admitted
     initializeAdmittedHeaders();
-    admittedInitData();
+    initializeAdmittedHeaders();
+    gettAdmittedFromApiAndLinkToTable();
+
   }
 
   @override

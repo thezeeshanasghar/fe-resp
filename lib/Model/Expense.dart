@@ -1,5 +1,27 @@
 import 'package:flutter/foundation.dart';
+
+
 class Expense {
+  final bool isSuccess;
+  final String message;
+  final List<PatientExpense> data;
+
+  Expense({
+    @required this.isSuccess,
+    @required this.message,
+    @required this.data,
+  });
+
+  factory Expense.fromJson(Map<String, dynamic> json) {
+    var list = json['data'] as List;
+    List<PatientExpense> dataList =
+    list.map((i) => PatientExpense.fromJson(i)).toList();
+    return Expense(
+        isSuccess: json['isSuccess'], message: json['message'], data: dataList);
+  }
+}
+
+class PatientExpense {
   final int id;
   final String BillType;
   final String PaymentType;
@@ -11,7 +33,7 @@ class Expense {
   final String TransactionDetail;
 
 
-  Expense({
+  PatientExpense({
     this.id,
     @required this.BillType,
     @required this.PaymentType,
@@ -23,8 +45,8 @@ class Expense {
     @required this.TransactionDetail
   });
 
-  factory Expense.fromJson(Map<String, dynamic> json) {
-    return Expense(
+  factory PatientExpense.fromJson(Map<String, dynamic> json) {
+    return PatientExpense(
       id: json['id'],
       BillType: json['billType'],
       PaymentType: json['paymentType'],

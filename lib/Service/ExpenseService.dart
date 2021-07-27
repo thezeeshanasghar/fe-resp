@@ -7,16 +7,11 @@ import 'package:http/http.dart' as http;
 
 class ExpenseService {
 
-  Future<List<Expense>> getExpenses() async {
+  Future<Expense> getExpenses() async {
     final response =
     await http.get(Uri.https(Strings.pathAPI, 'api/Expense/get'));
-    if (response.statusCode == 200) {
-      final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
-      return parsed.map<Expense>((json) => Expense.fromJson(json)).toList();
-
-    } else {
-      throw Exception('Failed to load Employee');
-    }
+    final jsonResponse = jsonDecode(response.body);
+    return Expense.fromJson(jsonResponse);
   }
 
   Future<Expense> getExpenseById(int Id) async {
@@ -29,7 +24,7 @@ class ExpenseService {
       throw Exception('Failed to load Procedure');
     }
   }
-  Future<bool> InsertExpense(Expense expense) async {
+  Future<bool> InsertExpense(PatientExpense expense) async {
 
     // Map<String, dynamic> Obj = {
     //
@@ -47,7 +42,7 @@ class ExpenseService {
     }
   }
 
-  Future<bool> UpdateExpense(Expense expense) async {
+  Future<bool> UpdateExpense(PatientExpense expense) async {
     final response = await http.put(
         Uri.https(Strings.pathAPI, 'api/Expense/update/${expense.id}'),
         headers: <String, String>{

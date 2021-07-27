@@ -27,7 +27,7 @@ class _ExpenseListState extends State<ExpenseList> {
   bool expenseIsSearch = false;
   List<Map<String, dynamic>> expenseIsSource = [];
   List<Map<String, dynamic>> expenseSelecteds = [];
-  List<Expense> listExpenses;
+  List<PatientExpense> listExpenses;
   String expenseSelectableKey = "Invoice";
   String expenseSortColumn;
   bool expenseSortAscending = true;
@@ -245,40 +245,6 @@ class _ExpenseListState extends State<ExpenseList> {
     );
   }
 
-  // expense
-  List<Map<String, dynamic>> expenseGenerateData({int n: 100}) {
-    final List sourceexpense = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> tempsexpense = [];
-    var i = expenseIsSource.length;
-    print(i);
-    for (var data in sourceexpense) {
-      tempsexpense.add({
-        "No": i+1,
-        //"Date": "Feb 24, 2021",
-        "Bill Type": "utility",
-        "Payment Type":"cash",
-        "Employee": "Syed Basit Ali Shah $i",
-        "VoucherNo": "12345",
-        "ExpenseCategory": i + 100, // show false
-        "EmployeeName": "1000",  // show false
-        "TotalBill": "$i 000",
-        "Action": [i, 100],
-      });
-      i++;
-    }
-    return tempsexpense;
-  }
-  
-  
-
-  expenseInitData() async {
-    setState(() => expenseIsLoading = true);
-    Future.delayed(Duration(seconds: 0)).then((value) {
-      expenseIsSource.addAll(expenseGenerateData(n: 100));
-      setState(() => expenseIsLoading = false);
-    });
-  }
-
   void initVariablesAndClasses() {
     expenseHeaders = [];
     expensePerPage = [5, 10, 15, 100];
@@ -335,7 +301,7 @@ class _ExpenseListState extends State<ExpenseList> {
           }),
 
       DatatableHeader(
-          value: "Bill Type",
+          value: "BillType",
           show: true,
           flex: 2,
           sortable: true,
@@ -352,7 +318,7 @@ class _ExpenseListState extends State<ExpenseList> {
             );
           }),
       DatatableHeader(
-          value: "Payment Type",
+          value: "PaymentType",
           show: true,
           flex: 2,
           sortable: true,
@@ -489,18 +455,20 @@ class _ExpenseListState extends State<ExpenseList> {
     setState(() => expenseIsLoading = true);
     listExpenses = [];
     expenseIsSource = [];
-    listExpenses = await expenseService.getExpenses();
+    Expense expenseResponse = await expenseService.getExpenses();
+    listExpenses = expenseResponse.data;
     print(listExpenses);
     expenseIsSource.addAll(generateExpenseDataFromApi(listExpenses));
     setState(() => expenseIsLoading = false);
   }
 
   List<Map<String, dynamic>> generateExpenseDataFromApi(
-      List<Expense> listOfExpenses) {
+      List<PatientExpense> listOfExpenses) {
     List<Map<String, dynamic>> tempsexpense = [];
-    for (Expense expense in listOfExpenses) {
+    for (PatientExpense expense in listOfExpenses) {
       tempsexpense.add({
         "Id": expense.id,
+        "No": expense.id,
         "BillType": expense.BillType,
         "PaymentType": expense.PaymentType,
         "EmployeeOrVender": expense.EmployeeOrVender,
@@ -513,6 +481,4 @@ class _ExpenseListState extends State<ExpenseList> {
     }
     return tempsexpense;
   }
-
-
 }
