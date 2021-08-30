@@ -103,9 +103,9 @@ class _PatientListState extends State<PatientList> {
     setState(() => admittedIsLoading = true);
     admittedIsSource = [];
     var listAdmitted = [];
-    PatientInvoice patientResponse = await patientService.getPatientInvoice('admitted');
-    listAdmitted = patientResponse.data;
-    admittedIsSource.addAll(generateOnlineDataFromApi(listAdmitted));
+    // PatientInvoice patientResponse = await patientService.getPatientInvoice('admitted');
+    // listAdmitted = patientResponse.data;
+    // admittedIsSource.addAll(generateOnlineDataFromApi(listAdmitted));
     setState(() => admittedIsLoading = false);
   }
 
@@ -504,9 +504,9 @@ class _PatientListState extends State<PatientList> {
     setState(() => walkInIsLoading = true);
     walkInIsSource = [];
     var listWalkIns = [];
-    PatientInvoice patientResponse = await patientService.getPatientInvoice('walkin');
-    listWalkIns = patientResponse.data;
-    walkInIsSource.addAll(generatewalkInDataFromApi(listWalkIns));
+    // PatientInvoice patientResponse = await patientService.getPatientInvoice('walkin');
+    // listWalkIns = patientResponse.data;
+    // walkInIsSource.addAll(generatewalkInDataFromApi(listWalkIns));
     setState(() => walkInIsLoading = false);
   }
   List<Map<String, dynamic>> generatewalkInDataFromApi(List<PatientInvoiceData> listWalkIns) {
@@ -547,9 +547,9 @@ class _PatientListState extends State<PatientList> {
     setState(() => onlineIsLoading = true);
     onlineIsSource = [];
     var listOnlines = [];
-    PatientInvoice patientResponse = await patientService.getPatientInvoice('Online');
-    listOnlines = patientResponse.data;
-    onlineIsSource.addAll(generateOnlineDataFromApi(listOnlines));
+    // PatientInvoice patientResponse = await patientService.getPatientInvoice('Online');
+    // listOnlines = patientResponse.data;
+    // onlineIsSource.addAll(generateOnlineDataFromApi(listOnlines));
     setState(() => onlineIsLoading = false);
   }
   initializeOnlineHeaders() {

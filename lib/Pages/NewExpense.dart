@@ -1,41 +1,54 @@
+import 'package:baby_receptionist/Common/GlobalProgressDialog.dart';
+import 'package:baby_receptionist/Common/GlobalRefreshToken.dart';
+import 'package:baby_receptionist/Common/GlobalSnakbar.dart';
 import 'package:baby_receptionist/Design/Shade.dart';
+import 'package:baby_receptionist/Model/Requests/ExpenseRequest.dart';
+import 'package:baby_receptionist/Model/Responses/ExpenseResponse.dart';
+import 'package:baby_receptionist/Providers/TokenProvider.dart';
 import 'package:baby_receptionist/Service/ExpenseService.dart';
-import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
-import 'package:baby_receptionist/Model/Expense.dart';
-import 'dart:convert';
+import 'package:provider/provider.dart';
 import 'package:baby_receptionist/Design/Strings.dart';
 
-
 class NewExpense extends StatefulWidget {
-  @override
   _NewExpenseState createState() => _NewExpenseState();
 }
 
 class _NewExpenseState extends State<NewExpense> {
-  final NewExpenseKey = GlobalKey<FormState>();
-  String BillType = 'Select Final Bill';
-  String PaymentType ='Payment Option';
-  String VoucherNo;
-  String FinalBill;
-  String CashPayment ;
-  String EmployeeOrVendor='Employee or Vendor';
-  String VoucherNumber;
-  String ExpenseCategory='Choose Expense Category';
-  String VendorName;
-  String EmployeeName;
-  int TotalBill;
-  String TransactionDetails;
+  final formKey = GlobalKey<FormState>();
+  String billType = 'Select Final Bill';
+  String paymentType = 'Payment Option';
+  String voucherNo;
+  String finalBill;
+  String cashPayment;
+
+  String employeeOrVendor = 'Employee or Vendor';
+  String voucherNumber;
+  String expenseCategory = 'Choose Expense Category';
+  String vendorName;
+  String employeeName;
+  double totalBill;
+  String transactionDetails;
+  GlobalProgressDialog globalProgressDialog;
   bool loadingButtonProgressIndicator = false;
   SimpleFontelicoProgressDialog _dialog;
   ExpenseService expenseService;
+  bool hasChangeDependencies = false;
+
   @override
   void initState() {
     super.initState();
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      globalProgressDialog = GlobalProgressDialog(context);
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -64,20 +77,20 @@ class _NewExpenseState extends State<NewExpense> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Form(
-                  key: NewExpenseKey,
+                  key: formKey,
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        widgetFinalBill(),
-                        widgetCashPayment(),
-                        widgetEmployeeOrVendor(),
-                        widgetVoucherNumber(),
-                        widgetExpenseCategory(),
-                        widgetEmployeeName(),
-                        widgetTotalBill(),
-                        widgetTransactionDetails(),
+                        widgetfinalBill(),
+                        widgetcashPayment(),
+                        widgetemployeeOrVendor(),
+                        widgetvoucherNumber(),
+                        widgetexpenseCategory(),
+                        widgetemployeeName(),
+                        widgettotalBill(),
+                        widgettransactionDetails(),
                         widgetSubmit()
                       ],
                     ),
@@ -91,22 +104,20 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
-  Widget widgetFinalBill() {
+  Widget widgetfinalBill() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
       child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.grey)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: DropdownButtonFormField<String>(
             isExpanded: true,
-            value: BillType,
+            value: billType,
             elevation: 16,
             onChanged: (String newValue) {
               setState(() {
-                BillType = newValue;
+                billType = newValue;
               });
             },
             items: <String>[
@@ -125,22 +136,20 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
-  Widget widgetCashPayment() {
+  Widget widgetcashPayment() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
       child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.grey)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: DropdownButtonFormField<String>(
             isExpanded: true,
-            value: PaymentType,
+            value: paymentType,
             elevation: 16,
             onChanged: (String newValue) {
               setState(() {
-                PaymentType = newValue;
+                paymentType = newValue;
               });
             },
             items: <String>[
@@ -160,7 +169,7 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
-  Widget widgetVoucherNumber() {
+  Widget widgetvoucherNumber() {
     return Column(
       children: [
         Padding(
@@ -169,18 +178,16 @@ class _NewExpenseState extends State<NewExpense> {
             maxLength: 13,
             autofocus: false,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.credit_card),
-                border: OutlineInputBorder(),
-                labelText: 'Voucher Number'),
+                prefixIcon: Icon(Icons.credit_card), border: OutlineInputBorder(), labelText: 'Voucher Number'),
             validator: (String value) {
-              int VoucherNo = int.tryParse(value);
+              int voucherNo = int.tryParse(value);
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
               return null;
             },
             onSaved: (String value) {
-              VoucherNo = value;
+              voucherNo = value;
             },
           ),
         ),
@@ -188,22 +195,20 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
-  Widget widgetEmployeeOrVendor() {
+  Widget widgetemployeeOrVendor() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
       child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.grey)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: DropdownButtonFormField<String>(
             isExpanded: true,
-            value: EmployeeOrVendor,
+            value: employeeOrVendor,
             elevation: 16,
             onChanged: (String newValue) {
               setState(() {
-                EmployeeOrVendor = newValue;
+                employeeOrVendor = newValue;
               });
             },
             items: <String>[
@@ -222,22 +227,20 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
-  Widget widgetExpenseCategory() {
+  Widget widgetexpenseCategory() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
       child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.grey)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: DropdownButtonFormField<String>(
             isExpanded: true,
-            value: ExpenseCategory,
+            value: expenseCategory,
             elevation: 16,
             onChanged: (String newValue) {
               setState(() {
-                ExpenseCategory = newValue;
+                expenseCategory = newValue;
               });
             },
             items: <String>[
@@ -260,7 +263,7 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
-  Widget widgetEmployeeName() {
+  Widget widgetemployeeName() {
     return Column(
       children: [
         Padding(
@@ -269,9 +272,7 @@ class _NewExpenseState extends State<NewExpense> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Employee Name'),
+                prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Employee Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -279,7 +280,7 @@ class _NewExpenseState extends State<NewExpense> {
               return null;
             },
             onSaved: (String value) {
-              EmployeeName = value;
+              employeeName = value;
             },
           ),
         ),
@@ -287,7 +288,7 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
-  Widget widgetVendorName() {
+  Widget widgetvendorName() {
     return Column(
       children: [
         Padding(
@@ -295,10 +296,8 @@ class _NewExpenseState extends State<NewExpense> {
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
-            decoration: InputDecoration(
-                icon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Vendor Name'),
+            decoration:
+                InputDecoration(icon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Vendor Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -306,7 +305,7 @@ class _NewExpenseState extends State<NewExpense> {
               return null;
             },
             onSaved: (String value) {
-              VendorName = value;
+              vendorName = value;
             },
           ),
         ),
@@ -314,7 +313,7 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
-  Widget widgetTotalBill() {
+  Widget widgettotalBill() {
     return Column(
       children: [
         Padding(
@@ -323,18 +322,16 @@ class _NewExpenseState extends State<NewExpense> {
             maxLength: 13,
             autofocus: false,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.credit_card),
-                border: OutlineInputBorder(),
-                labelText: 'Total Bill '),
+                prefixIcon: Icon(Icons.credit_card), border: OutlineInputBorder(), labelText: 'Total Bill '),
             validator: (String value) {
-              int _TotalBill = int.tryParse(value);
+              int _totalBill = int.tryParse(value);
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
               return null;
             },
             onSaved: (String value) {
-              TotalBill = int.tryParse(value);
+              totalBill = double.tryParse(value);
             },
           ),
         ),
@@ -342,7 +339,7 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
-  Widget widgetTransactionDetails() {
+  Widget widgettransactionDetails() {
     return Column(
       children: [
         Padding(
@@ -354,9 +351,7 @@ class _NewExpenseState extends State<NewExpense> {
             textAlignVertical: TextAlignVertical.top,
             maxLines: null,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.transform),
-                border: OutlineInputBorder(),
-                labelText: 'Transaction Details'),
+                prefixIcon: Icon(Icons.transform), border: OutlineInputBorder(), labelText: 'Transaction Details'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -364,7 +359,7 @@ class _NewExpenseState extends State<NewExpense> {
               return null;
             },
             onSaved: (String value) {
-              TransactionDetails = value;
+              transactionDetails = value;
             },
           ),
         ),
@@ -387,84 +382,68 @@ class _NewExpenseState extends State<NewExpense> {
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
-              onPressed: () {
-                // if (!NewExpenseKey.currentState.validate()) {
-                //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                //       content:
-                //           Text('Error: Some input fields are not filled.')));
-                //   return;
-                // }
-                // ScaffoldMessenger.of(context)
-                //     .showSnackBar(SnackBar(content: Text('Successfull')));
-                // NewExpenseKey.currentState.save();
-                onPressedSubmitButton();
-              },
+              onPressed: () => onPressedSubmitButton(),
             ),
           ),
         ),
       ],
     );
   }
-  onPressedSubmitButton() async {
-    // print(qualificationList);
-    // print(diplomaList);
-    List<dynamic> degrees = [];
-    if (!NewExpenseKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
+
+  Future<void> onPressedSubmitButton() async {
+    if (!formKey.currentState.validate()) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
       return;
     }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
-    NewExpenseKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
-
-    PatientExpense expense = new PatientExpense(
-        BillType: BillType,
-        PaymentType: PaymentType,
-        EmployeeOrVender: EmployeeOrVendor,
-        VoucherNo: VoucherNo,
-        ExpenseCategory: ExpenseCategory,
-        EmployeeName: EmployeeName,
-        TotalBill: TotalBill,
-        TransactionDetail: TransactionDetails,
-        );
- 
-    var json = jsonEncode(expense.toJson());
-    print(json);
-
-    var response = await expenseService.InsertExpense(expense);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created  Expense'),
-            ],
-          )));
-      Navigator.pushNamed(context, Strings.titleHomePage);
-      NewExpenseKey.currentState.reset();
+    formKey.currentState.save();
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
+    bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+    if (hasToken) {
+      onCallingInsertExpense();
     } else {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add Expense '),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
     }
+  }
+
+  Future<void> onCallingInsertExpense() async {
+    ExpenseService expenseService = ExpenseService();
+    ExpenseResponse serviceResponse = await expenseService.insertExpense(
+        ExpenseRequest(
+            id: 0,
+            billType: billType,
+            paymentType: paymentType,
+            employeeOrVender: employeeOrVendor,
+            voucherNo: voucherNo,
+            expenseCategory: expenseCategory,
+            employeeName: employeeName,
+            totalBill: totalBill,
+            transactionDetail: transactionDetails),
+        context.read<TokenProvider>().tokenSample.jwtToken);
+    if (serviceResponse != null) {
+      if (serviceResponse.isSuccess) {
+        formKey.currentState.reset();
+        resetValues();
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, serviceResponse.message, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, serviceResponse.message, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } else {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
+
+  void resetValues() {
+    formKey.currentState.reset();
+    setState(() {
+       billType = 'Select Final Bill';
+       paymentType = 'Payment Option';
+       employeeOrVendor = 'Employee or Vendor';
+       expenseCategory = 'Choose Expense Category';
+    });
   }
 }

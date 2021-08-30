@@ -1,19 +1,17 @@
-import 'dart:convert';
-import 'dart:math';
-
+import 'package:baby_receptionist/Common/GlobalProgressDialog.dart';
+import 'package:baby_receptionist/Common/GlobalRefreshToken.dart';
+import 'package:baby_receptionist/Common/GlobalSnakbar.dart';
 import 'package:baby_receptionist/Design/Dimens.dart';
 import 'package:baby_receptionist/Design/Shade.dart';
 import 'package:baby_receptionist/Design/Strings.dart';
-import 'package:baby_receptionist/Model/Appointment.dart';
-import 'package:baby_receptionist/Model/Patient.dart';
-import 'package:dropdown_formfield/dropdown_formfield.dart';
+import 'package:baby_receptionist/Model/Requests/PatientRequest.dart';
+import 'package:baby_receptionist/Model/Responses/PatientResponse.dart';
+import 'package:baby_receptionist/Providers/TokenProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:baby_receptionist/Service/PatientService.dart';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+import 'package:provider/provider.dart';
 
 class AddPatient extends StatefulWidget {
   @override
@@ -23,39 +21,45 @@ class AddPatient extends StatefulWidget {
 class _AddPatientState extends State<AddPatient> {
   final formKey = GlobalKey<FormState>();
   final DOBController = TextEditingController();
+  final JoinningDateController = TextEditingController();
   final ReferedDateController = TextEditingController();
 
-  String PatientType;
+  GlobalProgressDialog globalProgressDialog;
+  String patientType;
   DateTime DateOfBirth;
   String ValueChoose;
   String email;
-  String Sex = 'Choose Gender';
-  String name;
+  String firstName;
+  String lastName;
   String fatherHusbandName;
+  String gender = 'Choose Gender';
   String address;
-  String city;
-  String localArea;
   String dob;
   String contact;
+  String emergencyContact;
+  String joinningDate;
   String cnic;
-  String placeofBirth;
+  int floorNo;
+  String experience;
   String maritalStatus;
   String externalId;
   String bloodGroup;
   String clinicSite;
   String referedBy;
+  String placeBirth;
   String referedDate;
   String religion;
-  String patientGardian;
+  String guardian;
   String paymentProfile;
+  String description;
   PatientService patientService;
   bool loadingButtonProgressIndicator = false;
   SimpleFontelicoProgressDialog _dialog;
   List listitem = ["Admitted", "Non Admitted"];
   int selectedRadioTile;
   int selectedRadio;
-
-  String PatientCategory = 'Walk In';
+  bool hasChangeDependencies = false;
+  String category = 'Walk In';
 
   @override
   void initState() {
@@ -63,8 +67,16 @@ class _AddPatientState extends State<AddPatient> {
     patientService = PatientService();
     selectedRadio = 0;
     selectedRadioTile = 0;
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
+    _dialog = SimpleFontelicoProgressDialog(context: context, barrierDimisable: false);
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      globalProgressDialog = GlobalProgressDialog(context);
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   setSelectedRadioTile(int val) {
@@ -100,35 +112,36 @@ class _AddPatientState extends State<AddPatient> {
                 child: Form(
                   key: formKey,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
+                    padding: const EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        widgetPatientCategory(),
-                        widgetName(),
-                        widgetFatherOrHusbandName(),
-                        widgetCity(),
-                        widgetLocalArea(),
-                        widgetDateOfBirth(),
+                        widgetcategory(),
+                        widgetFirstName(),
+                        widgetLastName(),
+                        widgetFatherHusbandName(),
                         widgetGender(),
-                        widgetPlaceOFBirth(),
-                        widgetEmail(),
+                        widgetCnic(),
                         widgetContactNumber(),
-                        widgetCNIC(),
+                        widgetEmergencyContactNumber(),
+                        widgetEmail(),
+                        widgetAddress(),
+                        widgetJoinningDate(),
+                        widgetDateOfBirth(),
+                        widgetFloorNo(),
+                        widgetExperience(),
+                        widgetpatientType(),
                         widgetStatus(),
-                        widgetPatientType(),
+                        widgetReligion(),
                         widgetPatientExternalID(),
                         widgetBloodGroup(),
                         widgetClinicSite(),
                         widgetReferredBy(),
                         widgetReferredDate(),
-                        widgetReligion(),
                         widgetParentGuardian(),
                         widgetPaymentProfile(),
+                        widgetDescription(),
                         widgetSubmit()
                       ],
                     ),
@@ -142,13 +155,88 @@ class _AddPatientState extends State<AddPatient> {
     );
   }
 
-  Widget widgetPatientCategory() {
+  Widget widgetFirstName() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+          child: TextFormField(
+            autofocus: false,
+            decoration:
+                InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'First Name'),
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: (String value) {
+              firstName = value;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetLastName() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+          child: TextFormField(
+            autofocus: false,
+            decoration:
+                InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Last Name'),
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: (String value) {
+              lastName = value;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetFatherHusbandName() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+          child: TextFormField(
+            autofocus: false,
+            maxLength: 15,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Father/Husband Name'),
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: (String value) {
+              fatherHusbandName = value;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetcategory() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 0, 4, 15),
       child: Card(
         shape: BeveledRectangleBorder(
-            borderRadius: BorderRadius.circular(2.5),
-            side: BorderSide(color: Colors.grey, width: 0)),
+            borderRadius: BorderRadius.circular(2.5), side: BorderSide(color: Colors.grey, width: 0)),
         color: Colors.grey[100],
         child: Column(
           children: [
@@ -172,10 +260,10 @@ class _AddPatientState extends State<AddPatient> {
                         child: RadioListTile(
                           title: const Text('Walk In'),
                           value: "WalkIn",
-                          groupValue: PatientCategory,
+                          groupValue: category,
                           onChanged: (String value) {
                             setState(() {
-                              PatientCategory = value;
+                              category = value;
                             });
                           },
                         ),
@@ -184,10 +272,10 @@ class _AddPatientState extends State<AddPatient> {
                         child: RadioListTile(
                           title: const Text('On Call'),
                           value: "OnCall",
-                          groupValue: PatientCategory,
+                          groupValue: category,
                           onChanged: (String value) {
                             setState(() {
-                              PatientCategory = value;
+                              category = value;
                             });
                           },
                         ),
@@ -203,29 +291,76 @@ class _AddPatientState extends State<AddPatient> {
     );
   }
 
-  Widget widgetName() {
+  Widget widgetGender() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
+          child: Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  Dimens.globalDbffLeft, Dimens.globalDbffTop, Dimens.globalDbffRight, Dimens.globalDbffBottom),
+              child: DropdownButtonFormField<String>(
+                isExpanded: true,
+                value: gender,
+                elevation: 16,
+                decoration: InputDecoration.collapsed(hintText: ''),
+                validator: (String value) {
+                  if (value == 'Choose Gender') {
+                    return 'This field cannot be empty';
+                  }
+                  return null;
+                },
+                onChanged: (String newValue) {
+                  setState(() {
+                    gender = newValue;
+                  });
+                },
+                items: <String>[
+                  'Choose Gender',
+                  'Male',
+                  'Female',
+                  'Other',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetCnic() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
+            maxLength: 13,
             autofocus: false,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Patient Name'),
+                prefixIcon: Icon(Icons.credit_card), border: OutlineInputBorder(), labelText: 'CNIC Number'),
             validator: (String value) {
+              int _cnic = int.tryParse(value);
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
+              } else if (_cnic == null) {
+                return 'Syntax Error: CNIC mut be in numeric form\nCorrect Syntax: 6110185363984';
+              } else if (value.length > 13 || value.length < 13) {
+                return 'Syntax Error: A valid CNIC must have 13 digits';
               }
               return null;
             },
             onSaved: (String value) {
-              name = value;
+              cnic = value;
             },
           ),
         ),
@@ -233,71 +368,137 @@ class _AddPatientState extends State<AddPatient> {
     );
   }
 
-  Widget widgetGender() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.grey)),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: Sex,
-            elevation: 16,
-            underline: Container(
-              height: 0,
-              color: Colors.deepPurpleAccent,
-            ),
-            onChanged: (String newValue) {
-              setState(() {
-                Sex = newValue;
-              });
-            },
-            items: <String>[
-              'Choose Gender',
-              'Male',
-              'Female',
-              'Other',
-            ].map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget widgetFatherOrHusbandName() {
+  Widget widgetContactNumber() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
+              maxLength: 11,
+              autofocus: false,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Contact Number'),
+              validator: (String value) {
+                int _number = int.tryParse(value);
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                } else if (_number == null) {
+                  return 'Syntax Error: Contact Number must be in numeric form\nCorrect Syntax: 03120607088';
+                } else if (value.length < 11) {
+                  return 'Syntax Error: A valid Contact Number must have 11 digits\nCorrect Syntax: 03120607088';
+                } else if (value.substring(0, 1) != "0") {
+                  return 'Syntax Error: A valid Contact Number must start with 0\nCorrect Syntax: 03120607088';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                contact = value;
+              }),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetFloorNo() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+          child: TextFormField(
+              maxLength: 2,
+              autofocus: false,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Floor Number'),
+              validator: (String value) {
+                int _number = int.tryParse(value);
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                } else if (_number == null) {
+                  return 'Syntax Error: Floor Number must be in numeric form\nCorrect Syntax: 1, 2';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                floorNo = int.parse(value);
+              }),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetExperience() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+          child: TextFormField(
+              maxLength: 2,
+              autofocus: false,
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Experience'),
+              validator: (String value) {
+                int _number = int.tryParse(value);
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                } else if (_number == null) {
+                  return 'Syntax Error: Experience must be in numeric form\nCorrect Syntax: 1, 2';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                experience = value;
+              }),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetPlaceOFBirth() {
+    return Column(children: [
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: TextFormField(
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Father Or Husband Name'),
-            validator: (String value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
+                prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Place of Birth'),
             onSaved: (String value) {
-              fatherHusbandName = value;
-            },
-          ),
+              placeBirth = value;
+            }),
+      ),
+    ]);
+  }
+
+  Widget widgetEmergencyContactNumber() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+          child: TextFormField(
+              maxLength: 11,
+              autofocus: false,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Emergency Contact Number'),
+              validator: (String value) {
+                int _number = int.tryParse(value);
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                } else if (_number == null) {
+                  return 'Syntax Error:Emergency Contact Number must be in numeric form\nCorrect Syntax: 03120607088';
+                } else if (value.length < 11) {
+                  return 'Syntax Error: A valid Emergency Contact Number must have 11 digits\nCorrect Syntax: 03120607088';
+                } else if (value.substring(0, 1) != "0") {
+                  return 'Syntax Error: A valid Emergency Contact Number must start with 0\nCorrect Syntax: 03120607088';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                emergencyContact = value;
+              }),
         ),
       ],
     );
@@ -307,22 +508,16 @@ class _AddPatientState extends State<AddPatient> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
-                  labelText: 'Email'),
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.email), border: OutlineInputBorder(), labelText: 'Email'),
               validator: (String value) {
-                bool emailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(value);
+                bool emailValid =
+                    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value);
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
                 }
@@ -339,22 +534,17 @@ class _AddPatientState extends State<AddPatient> {
     );
   }
 
-  Widget widgetCity() {
+  Widget widgetAddress() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'City'),
+            decoration:
+                InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Address'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -362,7 +552,7 @@ class _AddPatientState extends State<AddPatient> {
               return null;
             },
             onSaved: (String value) {
-              city = value;
+              address = value;
             },
           ),
         ),
@@ -370,29 +560,29 @@ class _AddPatientState extends State<AddPatient> {
     );
   }
 
-  Widget widgetLocalArea() {
+  Widget widgetJoinningDate() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
-            autofocus: false,
+            controller: JoinningDateController,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Local Area'),
+              prefixIcon: Icon(Icons.date_range),
+              border: OutlineInputBorder(),
+              labelText: 'Admitted Date',
+            ),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
-              return null;
             },
             onSaved: (String value) {
-              localArea = value;
+              joinningDate = value;
+            },
+            onTap: () {
+              pickDateJoinningDate();
             },
           ),
         ),
@@ -404,11 +594,8 @@ class _AddPatientState extends State<AddPatient> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             controller: DOBController,
             decoration: InputDecoration(
@@ -433,104 +620,12 @@ class _AddPatientState extends State<AddPatient> {
     );
   }
 
-  Widget widgetContactNumber() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
-          child: TextFormField(
-              maxLength: 11,
-              autofocus: false,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Contact Number'),
-              validator: (String value) {
-                int _number = int.tryParse(value);
-                if (value == null || value.isEmpty) {
-                  return 'This field cannot be empty';
-                } else if (_number == null) {
-                  return 'Syntax Error: Contact Number must be in numeric form\nCorrect Syntax: 03120607088';
-                } else if (value.length < 11) {
-                  return 'Syntax Error: A valid Contact Number must have 11 digits\nCorrect Syntax: 03120607088';
-                } else if (value.substring(0, 1) != "0") {
-                  return 'Syntax Error: A valid Contact Number must start with 0\nCorrect Syntax: 03120607088';
-                }
-                return null;
-              },
-              onSaved: (String value) {
-                contact = value;
-              }),
-        ),
-      ],
-    );
-  }
-
-  Widget widgetPlaceOFBirth() {
-    return Column(children: [
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        child: TextFormField(
-            autofocus: false,
-            maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Place of Birth'),
-            onSaved: (String value) {
-              placeofBirth = value;
-            }),
-      ),
-    ]);
-  }
-
-  Widget widgetCNIC() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
-          child: TextFormField(
-            maxLength: 13,
-            autofocus: false,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.credit_card),
-                border: OutlineInputBorder(),
-                labelText: 'CNIC Number'),
-            validator: (String value) {
-              int _cnic = int.tryParse(value);
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              } else if (_cnic == null) {
-                return 'Syntax Error: CNIC mut be in numeric form\nCorrect Syntax: 6110185363984';
-              } else if (value.length > 13 || value.length < 13) {
-                return 'Syntax Error: A valid CNIC must have 13 digits';
-              }
-              return null;
-            },
-            onSaved: (String value) {
-              cnic = value;
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget widgetPatientType() {
+  Widget widgetpatientType() {
     return Padding(
       padding: EdgeInsets.fromLTRB(4, 0, 4, 20),
       child: Card(
         shape: BeveledRectangleBorder(
-            borderRadius: BorderRadius.circular(2.5),
-            side: BorderSide(color: Colors.grey, width: 1)),
+            borderRadius: BorderRadius.circular(2.5), side: BorderSide(color: Colors.grey, width: 1)),
         color: Colors.grey[100],
         child: Column(
           children: [
@@ -543,10 +638,10 @@ class _AddPatientState extends State<AddPatient> {
                   title: const Text('Panel'),
                   leading: Radio(
                     value: "Panel",
-                    groupValue: PatientType,
+                    groupValue: patientType,
                     onChanged: (String value) {
                       setState(() {
-                        PatientType = value;
+                        patientType = value;
                       });
                     },
                   ),
@@ -555,10 +650,10 @@ class _AddPatientState extends State<AddPatient> {
                   title: const Text('Non-Panel'),
                   leading: Radio(
                     value: "Non-Panel",
-                    groupValue: PatientType,
+                    groupValue: patientType,
                     onChanged: (String value) {
                       setState(() {
-                        PatientType = value;
+                        patientType = value;
                       });
                     },
                   ),
@@ -580,9 +675,7 @@ class _AddPatientState extends State<AddPatient> {
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Status (Optional)'),
+                prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Status (Optional)'),
             onSaved: (String value) {
               maritalStatus = value;
             },
@@ -621,9 +714,7 @@ class _AddPatientState extends State<AddPatient> {
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Blood Group (optional)'),
+                  prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Blood Group (optional)'),
               onSaved: (String value) {
                 bloodGroup = value;
               }),
@@ -661,9 +752,7 @@ class _AddPatientState extends State<AddPatient> {
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Referred By (optional)'),
+                  prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Referred By (optional)'),
               onSaved: (String value) {
                 referedBy = value;
               }),
@@ -676,11 +765,8 @@ class _AddPatientState extends State<AddPatient> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             controller: ReferedDateController,
             decoration: InputDecoration(
@@ -709,9 +795,7 @@ class _AddPatientState extends State<AddPatient> {
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Religion (optional)'),
+                  prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Religion (optional)'),
               onSaved: (String value) {
                 religion = value;
               }),
@@ -719,6 +803,7 @@ class _AddPatientState extends State<AddPatient> {
       ],
     );
   }
+
   Widget widgetParentGuardian() {
     return Column(
       children: [
@@ -728,11 +813,9 @@ class _AddPatientState extends State<AddPatient> {
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Parent/Guardian(optional)'),
+                  prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Parent/Guardian(optional)'),
               onSaved: (String value) {
-                patientGardian = value;
+                guardian = value;
               }),
         ),
       ],
@@ -759,17 +842,34 @@ class _AddPatientState extends State<AddPatient> {
     );
   }
 
+  Widget widgetDescription() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.payments_outlined),
+                  border: OutlineInputBorder(),
+                  labelText: 'Description (optional)'),
+              onSaved: (String value) {
+                description = value;
+              }),
+        ),
+      ],
+    );
+  }
+
   Widget widgetSubmit() {
     return Column(
       children: [
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -802,7 +902,7 @@ class _AddPatientState extends State<AddPatient> {
     }
   }
 
-  pickReferedDob() async {
+  pickDateJoinningDate() async {
     DateTime date = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -810,95 +910,112 @@ class _AddPatientState extends State<AddPatient> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        referedDate = date.toString();
-        ReferedDateController.text = referedDate.toString();
+        joinningDate = date.toString();
+        JoinningDateController.text = joinningDate.toString().substring(0, 10);
       });
     }
   }
 
-  onPressedSubmitButton() async {
-    // print(qualificationList);
-    // print(diplomaList);
-    List<dynamic> degrees = [];
+  pickReferedDob() async {
+    DateTime date = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2018),
+        lastDate: DateTime(DateTime.now().year + 1));
+    if (date != null) {
+      setState(() {
+        referedDate = date.toString();
+        ReferedDateController.text = referedDate.toString().substring(0, 10);
+      });
+    }
+  }
+
+  Future<void> onPressedSubmitButton() async {
     if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
       return;
     }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
     formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,
-        width: MediaQuery.of(context).size.width - 50);
-
-    PatientData patient = new PatientData(
-        name: name,
-        sex: Sex,
-        fatherHusbandName: fatherHusbandName,
-        email: email,
-        city: city,
-        localArea: localArea,
-        dob: dob,
-        patientDetails: "dob",
-        cnic: cnic,
-        contact: contact,
-        placeofBirth: placeofBirth,
-        patientCategory: PatientCategory,
-        maritalStatus: maritalStatus,
-        patientType: PatientType,
-        externalId: externalId,
-        bloodGroup: bloodGroup,
-        clinicSite: clinicSite,
-        referedBy: referedBy,
-        referedDate: referedDate,
-        religion: religion,
-        patientGardian: patientGardian,
-        paymentProfile: paymentProfile,
-       );
-
-    var json = jsonEncode(patient.toJson());
-    print(json);
-    print(patient);
-    var response = await patientService.InsertPatient(patient);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created Doctor '),
-              Text(
-                name,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      // Navigator.pushNamed(context, Strings.routeDoctorList);
-      formKey.currentState.reset();
-    } else {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                name,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
+    try {
+      globalProgressDialog.showSimpleFontellicoProgressDialog(
+          false, Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        onCallingInsertPatient();
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      print("Upper");
     }
+  }
+
+  Future<void> onCallingInsertPatient() async {
+    try {
+      PatientService patientService = PatientService();
+      PatientResponse patientResponse = await patientService.insertPatient(
+          PatientRequest(
+            id: 0,
+            userId: -1,
+            userType: "Patient",
+            dateOfBirth: dob,
+            maritalStatus: maritalStatus,
+            religion: religion,
+            firstName: firstName,
+            lastName: lastName,
+            fatherHusbandName: fatherHusbandName,
+            gender: gender,
+            cnic: cnic,
+            contact: contact,
+            emergencyContact: emergencyContact,
+            email: email,
+            address: address,
+            joiningDate: joinningDate,
+            floorNo: floorNo,
+            experience: experience,
+            category: category,
+            birthPlace: placeBirth,
+            type: patientType,
+            externalId: externalId,
+            bloodGroup: bloodGroup,
+            clinicSite: clinicSite,
+            referredBy: referedBy,
+            referredDate: referedDate,
+            guardian: guardian,
+            paymentProfile: paymentProfile,
+            description: description,
+            // appointmentType: 'OnCall',
+            appointmentCode: 'CODEE',
+            consultationDate: referedDate,
+          ),
+          context.read<TokenProvider>().tokenSample.jwtToken);
+
+      if (patientResponse != null) {
+        if (patientResponse.isSuccess) {
+          resetValues();
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, patientResponse.message, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, patientResponse.message, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
+
+  void resetValues() {
+    formKey.currentState.reset();
+    setState(() {
+      gender = 'Choose Gender';
+    });
   }
 }

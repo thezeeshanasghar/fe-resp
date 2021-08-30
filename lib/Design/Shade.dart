@@ -20,5 +20,10 @@ class Shade {
   static final Color elevatorButtonBackgroundStart = Colors.green;
   static final Color elevatorButtonBackgroundStop = Colors.red;
 
+  static const String apiPatientGet = 'api/patient/get';
+  static const String apiPatientInsert = 'api/patient/insert';
+  static const String apiPatientUpdate = 'api/patient/update';
+  static const String apiPatientDelete = 'api/patient/delete';
+
 
 }

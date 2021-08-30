@@ -1,72 +1,192 @@
-import 'package:baby_receptionist/Pages/Home.dart';
+import 'package:baby_receptionist/Design/Dimens.dart';
+import 'package:baby_receptionist/Design/Shade.dart';
+import 'package:baby_receptionist/Design/Strings.dart';
+import 'package:baby_receptionist/Model/Requests/AuthenticateRequest.dart';
+import 'package:baby_receptionist/Model/Responses/AuthenticateResponse.dart';
+import 'package:baby_receptionist/Providers/LoginCredentialsProvider.dart';
+import 'package:baby_receptionist/Providers/TokenProvider.dart';
+import 'package:baby_receptionist/Service/AuthenticationService.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_login/flutter_login.dart';
-
-const users = const {
-  'basit@gmail.com': 'basit',
-};
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginState createState() => _LoginState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  Duration get loginTime => Duration(milliseconds: 2250);
+class _LoginState extends State<LoginScreen> {
+  final formKey = GlobalKey<FormState>();
+  AuthenticationService authenticationService;
+  SimpleFontelicoProgressDialog simpleFontelicoProgressDialog;
 
-  Future<String> _authUser(LoginData data) {
-    print('Name: ${data.name}, Password: ${data.password}');
-    return Future.delayed(loginTime).then((_) {
-      if (!users.containsKey(data.name)) {
-        return 'Username not exists';
-      }
-      if (users[data.name] != data.password) {
-        return 'Password does not match';
-      }
-      return null;
-    });
+  String UserName;
+  String Password;
+
+  @override
+  void initState() {
+    super.initState();
+    initVariablesAndClasses();
   }
 
-  Future<String> _recoverPassword(String name) {
-    print('Name: $name');
-    return Future.delayed(loginTime).then((_) {
-      if (!users.containsKey(name)) {
-        return 'Username not exists';
-      }
-      return null;
-    });
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: '',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-        accentColor: Colors.blueGrey,
-        textTheme: TextTheme(
-          headline3: TextStyle(
-            fontFamily: 'OpenSans',
-            fontSize: 40.0,
-            color: Colors.white,
-          ),
-          button: TextStyle(
-            fontFamily: 'OpenSans',
-          ),
-          subtitle1: TextStyle(fontFamily: 'NotoSans'),
-          bodyText2: TextStyle(fontFamily: 'NotoSans'),
+    return Scaffold(
+      backgroundColor: Shade.globalBackgroundColor,
+      appBar: AppBar(
+        title: Text(Strings.titleLogin),
+        backgroundColor: Shade.globalAppBarColor,
+        automaticallyImplyLeading: false,
+      ),
+      body: DefaultTextStyle(
+        style: Theme.of(context).textTheme.bodyText2,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints:
+                BoxConstraints(minHeight: viewportConstraints.minHeight, minWidth: viewportConstraints.minWidth),
+                child: Padding(
+                    padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          widgetUserName(),
+                          widgetPassword(),
+                          widgetSubmit(),
+                        ],
+                      ),
+                    )),
+              ),
+            );
+          },
         ),
       ),
-      home: FlutterLogin(
-          title: 'Baby Receptionist',
-          onLogin: _authUser,
-          onSignup: _authUser,
-          onRecoverPassword: _recoverPassword,
-          hideSignUpButton: true,
-          onSubmitAnimationCompleted: () {
-            Navigator.pop(context);
-            Navigator.pushNamed(context, '/Home');
-          }),
     );
+  }
+
+  void initVariablesAndClasses() {
+    authenticationService = AuthenticationService();
+  }
+
+  Widget widgetUserName() {
+    return Column(
+      children: [
+        Padding(
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
+            child: TextFormField(
+              autofocus: false,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.supervised_user_circle), border: OutlineInputBorder(), labelText: 'User Name'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                UserName = value;
+              },
+            )),
+      ],
+    );
+  }
+
+  Widget widgetPassword() {
+    return Column(
+      children: [
+        Padding(
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
+            child: TextFormField(
+              autofocus: false,
+              obscureText: true,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.lock_outline_rounded), border: OutlineInputBorder(), labelText: 'Password'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                Password = value;
+              },
+            )),
+      ],
+    );
+  }
+
+  Widget widgetSubmit() {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.center,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+            child: ElevatedButton(
+              autofocus: false,
+              style: ElevatedButton.styleFrom(
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              ),
+              child: Text('Submit'),
+              onPressed: () => onPressedSubmitButton(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> onPressedSubmitButton() async {
+    // if (!formKey.currentState.validate()) {
+    //   return;
+    // }
+    // formKey.currentState.save();
+
+    AuthenticationService authenticationService = AuthenticationService();
+    AuthenticateResponse authenticateResponse = await authenticationService
+        .authenticateLogin(AuthenticateLoginRequest(UserName: 'ahmed@gmail.com', Password: 'ahmed'));
+    if (authenticateResponse != null) {
+      if (authenticateResponse.isSuccess) {
+        context.read<TokenProvider>().setToken(authenticateResponse.token);
+        context
+            .read<LoginCredentialsProvider>()
+            .setLoginCredentials(AuthenticateLoginRequest(UserName: 'ahmed@gmail.com', Password: 'ahmed'));
+        Navigator.pop(context);
+        Navigator.pushNamed(context, '/Home');
+      } else {
+        print(authenticateResponse.message);
+      }
+    } else {
+      showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Error: failed to call server');
+    }
+  }
+
+  void showMessageUsingSnackBar(Color snackColor, String snackText) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: snackColor,
+        content: Row(
+          children: [
+            Expanded(
+              child: Text(
+                snackText,
+                style: TextStyle(fontWeight: FontWeight.normal),
+              ),
+            ),
+          ],
+        )));
   }
 }

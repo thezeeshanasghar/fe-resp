@@ -98,22 +98,22 @@ class _NewInvoiceState extends State<NewInvoice> {
   }
 
   void getPatientData(int Id) async {
-    patientService = PatientService();
-    PatientSingleInvoice resp = await patientService.getPatientInvoiceById(Id);
-    setState(() {
-      print(resp.data.toJson());
-      _namecontroller.text = resp.data.name;
-      _fatherhusbandnamecontroller.text = resp.data.fatherHusbandName;
-      DateOfBirthController.text = resp.data.dob.substring(0, 10);
-      lastVisitDateController.text =
-          resp.data.lastAppointmentDate.substring(0, 10);
-      TodayVisitDateController.text =
-          DateTime.now().toString().substring(0, 10);
-      _citycontroller.text = resp.data.city;
-      _LocalAreacontroller.text = resp.data.area;
-      _emailcontroller.text = resp.data.email;
-      _contactcontroller.text = resp.data.contact;
-    });
+    // patientService = PatientService();
+    // PatientSingleInvoice resp = await patientService.getPatientInvoiceById(Id);
+    // setState(() {
+    //   print(resp.data.toJson());
+    //   _namecontroller.text = resp.data.name;
+    //   _fatherhusbandnamecontroller.text = resp.data.fatherHusbandName;
+    //   DateOfBirthController.text = resp.data.dob.substring(0, 10);
+    //   lastVisitDateController.text =
+    //       resp.data.lastAppointmentDate.substring(0, 10);
+    //   TodayVisitDateController.text =
+    //       DateTime.now().toString().substring(0, 10);
+    //   _citycontroller.text = resp.data.city;
+    //   _LocalAreacontroller.text = resp.data.area;
+    //   _emailcontroller.text = resp.data.email;
+    //   _contactcontroller.text = resp.data.contact;
+    // });
   }
 
   void initVariablesAndClasses() {

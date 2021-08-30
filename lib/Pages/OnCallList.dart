@@ -49,10 +49,10 @@ class _OnCallListState extends State<OnCallList> {
     setState(() => onCallIsLoading = true);
     onCallIsSource = [];
     var listOnCall = [];
-    PatientInvoice patientResponse = await patientService.getPatientInvoice('OnCall');
-    listOnCall = patientResponse.data;
-    print(patientResponse.data);
-    onCallIsSource.addAll(generateOnCallDataFromApi(listOnCall));
+    // PatientInvoice patientResponse = await patientService.getPatientInvoice('OnCall');
+    // listOnCall = patientResponse.data;
+    // print(patientResponse.data);
+    // onCallIsSource.addAll(generateOnCallDataFromApi(listOnCall));
     setState(() => onCallIsLoading = false);
   }
   List<Map<String, dynamic>> generateOnCallDataFromApi(List<PatientInvoiceData> listOnCall) {

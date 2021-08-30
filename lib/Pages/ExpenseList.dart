@@ -455,10 +455,10 @@ class _ExpenseListState extends State<ExpenseList> {
     setState(() => expenseIsLoading = true);
     listExpenses = [];
     expenseIsSource = [];
-    Expense expenseResponse = await expenseService.getExpenses();
-    listExpenses = expenseResponse.data;
-    print(listExpenses);
-    expenseIsSource.addAll(generateExpenseDataFromApi(listExpenses));
+    // Expense expenseResponse = await expenseService.getExpenses();
+    // listExpenses = expenseResponse.data;
+    // print(listExpenses);
+    // expenseIsSource.addAll(generateExpenseDataFromApi(listExpenses));
     setState(() => expenseIsLoading = false);
   }
 
