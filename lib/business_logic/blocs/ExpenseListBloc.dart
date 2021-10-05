@@ -1,6 +1,6 @@
 import 'package:baby_receptionist/business_logic/common/GlobalProgressDialog.dart';
 import 'package:baby_receptionist/business_logic/common/GlobalRefreshToken.dart';
-import 'package:baby_receptionist/business_logic/common/GlobalSnakbar.dart';
+import 'package:baby_receptionist/business_logic/common/GlobalSnackbar.dart';
 import 'package:baby_receptionist/data/models/Responses/ExpenseResponse.dart';
 import 'package:baby_receptionist/data/models/Sample/ExpenseSample.dart';
 import 'package:baby_receptionist/data/service/ExpenseService.dart';
@@ -74,8 +74,7 @@ class ExpenseListBloc {
     }
   }
 
-  Future<void> searchDataAndLinkToTable(
-      context, String token, String search) async {
+  Future<void> searchDataAndLinkToTable(String token, String search) async {
     try {
       ExpenseResponseList expenseResponseList =
           await expenseService.searchExpense(search: search, token: token);

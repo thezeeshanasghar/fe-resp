@@ -5,7 +5,9 @@ import 'package:baby_receptionist/presentation/constants/QColor.dart';
 import 'package:baby_receptionist/presentation/constants/QPadding.dart';
 import 'package:baby_receptionist/presentation/constants/QString.dart';
 import 'package:baby_receptionist/presentation/constants/QTextStyle.dart';
-import 'package:baby_receptionist/presentation/pages/appointment/appointment_list/WalkInAppointment.dart';
+import 'package:baby_receptionist/presentation/pages/appointment/AdmittedAppointment.dart';
+import 'package:baby_receptionist/presentation/pages/appointment/OnlineAppointment.dart';
+import 'package:baby_receptionist/presentation/pages/appointment/WalkInAppointment.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
@@ -24,7 +26,7 @@ class _AppointmentListState extends State<AppointmentList> {
   @override
   void initState() {
     super.initState();
-    bloc.changeTableType('walkIn');
+    bloc.changeTableType(QString.tableTypeWalkIn);
   }
 
   @override
@@ -81,8 +83,13 @@ class _AppointmentListState extends State<AppointmentList> {
                             builder: (context, snapshot) {
                               return Column(
                                 children: [
-                                  if (snapshot.data == 'walkIn')
+                                  if (snapshot.data == QString.tableTypeWalkIn)
                                     WalkInAppointment(bloc: bloc),
+                                  if (snapshot.data == QString.tableTypeOnline)
+                                    OnlineAppointment(bloc: bloc),
+                                  if (snapshot.data ==
+                                      QString.tableTypeAdmitted)
+                                    AdmittedAppointment(bloc: bloc),
                                 ],
                               );
                             }),
@@ -131,7 +138,7 @@ class _TableType extends StatelessWidget {
                               'Walk-in',
                               style: QTextStyle.tableTypeValue,
                             ),
-                            value: "walkIn",
+                            value: QString.tableTypeWalkIn,
                             groupValue: snapshot.data,
                             onChanged: bloc.changeTableType,
                           ),
@@ -142,7 +149,7 @@ class _TableType extends StatelessWidget {
                               'Online',
                               style: QTextStyle.tableTypeValue,
                             ),
-                            value: "online",
+                            value: QString.tableTypeOnline,
                             groupValue: snapshot.data,
                             onChanged: bloc.changeTableType,
                           ),
@@ -153,7 +160,7 @@ class _TableType extends StatelessWidget {
                               'Admitted',
                               style: QTextStyle.tableTypeValue,
                             ),
-                            value: "admitted",
+                            value: QString.tableTypeAdmitted,
                             groupValue: snapshot.data,
                             onChanged: bloc.changeTableType,
                           ),

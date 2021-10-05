@@ -157,7 +157,7 @@ class _ExpenseListState extends State<ExpenseList> {
               await bloc.getDataAndLinkToTable(
                   context, context.read<TokenProvider>().tokenSample.jwtToken);
             } else {
-              await bloc.searchDataAndLinkToTable(context,
+              await bloc.searchDataAndLinkToTable(
                   context.read<TokenProvider>().tokenSample.jwtToken, value);
             }
           }

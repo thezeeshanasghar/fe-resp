@@ -1,5 +1,5 @@
 import 'package:baby_receptionist/business_logic/blocs/AddPatientBloc.dart';
-import 'package:baby_receptionist/business_logic/common/GlobalSnakbar.dart';
+import 'package:baby_receptionist/business_logic/common/GlobalSnackbar.dart';
 import 'package:baby_receptionist/business_logic/provider/TokenProvider.dart';
 import 'package:baby_receptionist/presentation/constants/QColor.dart';
 import 'package:baby_receptionist/presentation/constants/QEnum.dart';
@@ -18,21 +18,23 @@ class AddPatient extends StatefulWidget {
 class _AddPatientState extends State<AddPatient> {
   final formKey = GlobalKey<FormState>();
 
-  TextEditingController tecReferredDate;
-  TextEditingController tecDateOfBirth;
-  TextEditingController tecJoiningDate;
+  final tecReferredDate = TextEditingController();
+  final tecDateOfBirth = TextEditingController();
+  final tecJoiningDate = TextEditingController();
 
   final bloc = AddPatientBloc();
 
   @override
   void initState() {
     super.initState();
-    initVariables();
   }
 
   @override
   void dispose() {
     bloc.dispose();
+    tecDateOfBirth.dispose();
+    tecReferredDate.dispose();
+    tecJoiningDate.dispose();
     super.dispose();
   }
 
@@ -103,12 +105,6 @@ class _AddPatientState extends State<AddPatient> {
         ),
       ),
     );
-  }
-
-  void initVariables() {
-    tecReferredDate = TextEditingController();
-    tecDateOfBirth = TextEditingController();
-    tecJoiningDate = TextEditingController();
   }
 
   Future<void> pickDate(initialDate, firstDate, lastDate, dateType) async {
@@ -211,60 +207,61 @@ class _AddPatientState extends State<AddPatient> {
 
   Widget widgetGender() {
     return StreamBuilder<String>(
-        stream: bloc.gender,
-        builder: (context, snapshot) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(
-                QPadding.globalDropDownFieldLeft,
-                QPadding.globalDropDownFieldTop,
-                QPadding.globalDropDownFieldRight,
-                QPadding.globalDropDownFieldBottom),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                        color: !snapshot.hasError
-                            ? QColor.globalNormalInputBorder
-                            : QColor.globalErrorInputBorder,
-                        style: BorderStyle.solid),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                        QPadding.globalDbffLeft,
-                        QPadding.globalDbffTop,
-                        QPadding.globalDbffRight,
-                        QPadding.globalDbffBottom),
-                    child: DropdownButtonFormField<String>(
-                      isExpanded: true,
-                      value: 'Choose Gender',
-                      elevation: 16,
-                      decoration: InputDecoration.collapsed(
-                        hintText: '',
-                      ),
-                      onChanged: bloc.changeGender,
-                      items: <String>[
-                        'Choose Gender',
-                        'Male',
-                        'Female',
-                        'Other',
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+      stream: bloc.gender,
+      builder: (context, snapshot) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+              QPadding.globalDropDownFieldLeft,
+              QPadding.globalDropDownFieldTop,
+              QPadding.globalDropDownFieldRight,
+              QPadding.globalDropDownFieldBottom),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(
+                      color: !snapshot.hasError
+                          ? QColor.globalNormalInputBorder
+                          : QColor.globalErrorInputBorder,
+                      style: BorderStyle.solid),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      QPadding.globalDbffLeft,
+                      QPadding.globalDbffTop,
+                      QPadding.globalDbffRight,
+                      QPadding.globalDbffBottom),
+                  child: DropdownButtonFormField<String>(
+                    isExpanded: true,
+                    value: 'Choose Gender',
+                    elevation: 16,
+                    decoration: InputDecoration.collapsed(
+                      hintText: '',
                     ),
+                    onChanged: bloc.changeGender,
+                    items: <String>[
+                      'Choose Gender',
+                      'Male',
+                      'Female',
+                      'Other',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   ),
                 ),
-                if (snapshot.hasError) QErrorWidget(error: snapshot.error),
-              ],
-            ),
-          );
-        });
+              ),
+              if (snapshot.hasError) QErrorWidget(error: snapshot.error),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget widgetCnic() {
@@ -954,6 +951,7 @@ class _AddPatientState extends State<AddPatient> {
                       ),
                       child: Text('Submit'),
                       onPressed: () async {
+                        bloc.validateFields();
                         if (snapshot.hasData) {
                           if (await bloc.checkTokenValidity(context)) {
                             if (await bloc.onInsertPatient(

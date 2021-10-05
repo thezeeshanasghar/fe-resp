@@ -21,7 +21,7 @@ mixin Validators {
         int.parse(globalInt);
         sink.add(globalInt);
       } catch (error) {
-        return sink.addError(QError.phoneInvalid);
+        return sink.addError(QError.intInvalid);
       }
     }
   });

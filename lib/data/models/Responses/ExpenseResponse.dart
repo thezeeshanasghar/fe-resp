@@ -15,7 +15,8 @@ class ExpenseResponse {
     return ExpenseResponse(
         isSuccess: json['isSuccess'],
         message: json['message'],
-        data: json['data'] != null ? ExpenseSample.fromJson(json['data']) : null);
+        data:
+            json['data'] != null ? ExpenseSample.fromJson(json['data']) : null);
   }
 }
 
@@ -36,6 +37,7 @@ class ExpenseResponseList {
       var list = json['data'] as List;
       dataList = list.map((i) => ExpenseSample.fromJson(i)).toList();
     }
-    return ExpenseResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
+    return ExpenseResponseList(
+        isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

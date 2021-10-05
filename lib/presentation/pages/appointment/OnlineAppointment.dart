@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:baby_receptionist/business_logic/blocs/AppointmentListBloc.dart';
-import 'package:baby_receptionist/business_logic/common/GlobalSnakbar.dart';
+import 'package:baby_receptionist/business_logic/common/GlobalSnackbar.dart';
 import 'package:baby_receptionist/business_logic/provider/TokenProvider.dart';
 import 'package:baby_receptionist/data/models/Requests/AppointmentRequest.dart';
 import 'package:baby_receptionist/presentation/constants/QDecoration.dart';
@@ -17,16 +17,16 @@ import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
 import 'package:provider/provider.dart';
 
-class WalkInAppointment extends StatefulWidget {
+class OnlineAppointment extends StatefulWidget {
   final AppointmentListBloc bloc;
 
-  WalkInAppointment({@required this.bloc});
+  OnlineAppointment({@required this.bloc});
 
   @override
-  _WalkInAppointmentState createState() => _WalkInAppointmentState();
+  _OnlineAppointmentState createState() => _OnlineAppointmentState();
 }
 
-class _WalkInAppointmentState extends State<WalkInAppointment> {
+class _OnlineAppointmentState extends State<OnlineAppointment> {
   bool hasChangeDependencies = false;
   final _tecToDate = TextEditingController();
   final _tecFromDate = TextEditingController();
@@ -36,6 +36,9 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
   void initState() {
     super.initState();
     widget.bloc.changeSelectDoctor(QString.dbffSelectDoctor);
+    widget.bloc.changeFromDate('');
+    widget.bloc.changeToDate('');
+    widget.bloc.changeSource(null);
     _headers = initializeHeaders();
   }
 
@@ -49,7 +52,7 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
         await widget.bloc.getDataAndLinkToTable(
             context: context,
             token: context.read<TokenProvider>().tokenSample.jwtToken,
-            category: QString.tableTypeWalkIn);
+            category: QString.tableTypeOnline);
       }
       hasChangeDependencies = true;
     }
@@ -74,7 +77,7 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
               if (snapshot.hasError) {
                 return NoteWidget(note: snapshot.error);
               } else if (snapshot.hasData) {
-                return widgetWalkInAppointment(snapshot.data);
+                return widgetOnlineAppointment(snapshot.data);
               } else {
                 return LoadingWidget();
               }
@@ -83,7 +86,7 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
     );
   }
 
-  Widget widgetWalkInAppointment(List<Map<String, dynamic>> source) {
+  Widget widgetOnlineAppointment(List<Map<String, dynamic>> source) {
     return Card(
       elevation: 1,
       shadowColor: Colors.black,
@@ -95,10 +98,8 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
           children: [
             widgetSearchPreference(),
             Container(
-              margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
-              constraints: BoxConstraints(
-                maxHeight: 500,
-              ),
+              margin: QPadding.tableMargins,
+              constraints: QPadding.tableConstraints,
               child: ResponsiveDatatable(
                 actions: [
                   widgetSearchField(),
@@ -109,7 +110,6 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
                 onTabRow: (data) {
                   print(data);
                 },
-                isLoading: false,
               ),
             ),
           ]),
@@ -144,8 +144,8 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
                   context: context,
                   token: context.read<TokenProvider>().tokenSample.jwtToken,
                   searchRequest: AppointmentSearchRequest(
-                    category: QString.tableTypeWalkIn,
-                    searchFrom: 'Category',
+                    category: QString.tableTypeOnline,
+                    searchFrom: QString.searchFromCategory,
                     booked: '1',
                     dateFrom: '1900-09-09',
                     dateTo: '1900-09-09',
@@ -165,8 +165,12 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
     return Padding(
       padding: QPadding.searchPreference,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               widgetSelectDoctor(),
               SizedBox(width: QPadding.searchPreferenceDifference),
@@ -174,7 +178,7 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
               SizedBox(width: QPadding.searchPreferenceDifference),
               widgetToDate(),
             ],
-          ),
+          )
         ],
       ),
     );
@@ -449,7 +453,7 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
       DatatableHeader(
           value: "date",
           show: true,
-          flex: 2,
+          flex: 1,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
             return Padding(
@@ -671,21 +675,294 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
             );
           }),
       DatatableHeader(
-          value: "description",
-          show: false,
-          flex: 1,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: QPadding.tableHeaders,
-              child: Center(
-                child: Text(
-                  "description",
-                  style: QTextStyle.tableHeaders,
-                ),
+        value: "description",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "description",
+                style: QTextStyle.tableHeaders,
               ),
-            );
-          }),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "userType",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "userType",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "dateOfBirth",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "dateOfBirth",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "maritalStatus",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "maritalStatus",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "religion",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "religion",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "firstName",
+        show: true,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "firstName",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "lastName",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "lastName",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "fatherHusbandName",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "fatherHusbandName",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "gender",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "gender",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "cnic",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "cnic",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "contact",
+        show: true,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "contact",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "emergencyContact",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "emergencyContact",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "email",
+        show: true,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "email",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "address",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "address",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "joiningDate",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "joiningDate",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "floorNo",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "floorNo",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
+      DatatableHeader(
+        value: "experience",
+        show: false,
+        flex: 1,
+        textAlign: TextAlign.center,
+        headerBuilder: (value) {
+          return Padding(
+            padding: QPadding.tableHeaders,
+            child: Center(
+              child: Text(
+                "experience",
+                style: QTextStyle.tableHeaders,
+              ),
+            ),
+          );
+        },
+      ),
       DatatableHeader(
           value: "action",
           show: true,
@@ -706,17 +983,17 @@ class _WalkInAppointmentState extends State<WalkInAppointment> {
           sourceBuilder: (id, row) {
             return Container(
                 child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    GlobalSnackbar.showMessageUsingSnackBar(
-                        Colors.black26, 'working on it', context);
-                  },
-                  child: Text('New Invoice', style: QTextStyle.tableNewInvoice),
-                ),
-              ],
-            ));
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        GlobalSnackbar.showMessageUsingSnackBar(
+                            Colors.black26, 'working on it', context);
+                      },
+                      child: Text('New Invoice', style: QTextStyle.tableNewInvoice),
+                    ),
+                  ],
+                ));
           }),
     ];
     return headers;

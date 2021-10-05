@@ -29,6 +29,7 @@ class QString {
   static const String routeInvoiceList = '/InvoiceList';
 
   static const String apiPatientGet = 'api/patient/get';
+  static const String apiPatientSearch = 'api/patient/search';
   static const String apiPatientInsert = 'api/patient/insert';
   static const String apiPatientUpdate = 'api/patient/update';
   static const String apiPatientDelete = 'api/patient/delete';
@@ -38,6 +39,12 @@ class QString {
   static const String apiApplicationJson = 'application/json; charset=UTF-8';
   static const String apiAuthorization = 'Authorization';
   static const String apiBearer = 'Bearer';
+
+  static const String apiInvoiceGet = 'api/invoice/get';
+  static const String apiInvoiceInsert = 'api/invoice/insert';
+  static const String apiInvoiceUpdate = 'api/invoice/update';
+  static const String apiInvoiceDelete = 'api/invoice/delete';
+  static const String apiInvoicePostSearch = 'api/invoice/post/search';
 
   static const String apiExpenseGet = 'api/expense/get';
   static const String apiExpenseSearch = 'api/expense/search';
@@ -51,6 +58,16 @@ class QString {
       'api/appointment/get/category';
   static const String apiAppointmentSearch = 'api/appointment/search';
   static const String apiAppointmentPostSearch = 'api/appointment/post/search';
+
+  static const String apiDoctorGet = 'api/doctor/get';
+  static const String apiDoctorInsert = 'api/doctor/insert';
+  static const String apiDoctorUpdate = 'api/doctor/update';
+  static const String apiDoctorDelete = 'api/doctor/delete';
+
+  static const String apiProcedureGet = 'api/procedure/get';
+  static const String apiProcedureInsert = 'api/procedure/insert';
+  static const String apiProcedureUpdate = 'api/procedure/update';
+  static const String apiProcedureDelete = 'api/procedure/delete';
 
   static const String errorToken = 'Token Error: Try Again.';
   static const String errorNull = 'Null Error: Failed to call server.';
@@ -84,7 +101,12 @@ class QString {
   static const String dbffChooseGender = 'Choose Gender';
 
   static const String dbffSelectDoctor = 'Select Doctor';
+  static const String dbffSelectDoctorType = 'Select Doctor Type';
   static const String dbffSelectBookedBy = 'Select Booked By';
+  static const String dbffSelectInvoiceType = 'Select Invoice Type';
+  static const String dbffSelectPaymentType = 'Select Payment Type';
+
+  static const String txtDoctorType = 'Doctor Type';
 
   static const String rbSelectPatientCategory = 'Patient Category';
   static const String rbSelectPatientType = 'Patient Type';

@@ -24,11 +24,11 @@ class QTextStyle {
   );
 
   static final tableTypeHeader = TextStyle(
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w500,
   );
 
   static final tableTypeValue = TextStyle(
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w400,
   );
 
   static final tableHeaders = TextStyle(
@@ -37,5 +37,13 @@ class QTextStyle {
 
   static final tableNewInvoice = TextStyle(
     color: Colors.blueAccent,
+  );
+
+  static final homeHeader = TextStyle(
+    fontWeight: FontWeight.w600,
+  );
+
+  static final homeItem = TextStyle(
+    fontWeight: FontWeight.w500,
   );
 }

@@ -1,8 +1,9 @@
-import 'package:baby_receptionist/business_logic/common/GlobalSnakbar.dart';
+import 'package:baby_receptionist/business_logic/common/GlobalSnackbar.dart';
 import 'package:baby_receptionist/presentation/Pages/LoginScreen.dart';
 import 'package:baby_receptionist/presentation/constants/QColor.dart';
 import 'package:baby_receptionist/presentation/constants/QPadding.dart';
 import 'package:baby_receptionist/presentation/constants/QString.dart';
+import 'package:baby_receptionist/presentation/constants/QTextStyle.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -38,7 +39,7 @@ class _HomeState extends State<Home> {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 0, 10, 0),
                       child: Text(
-                        'Syed Basit',
+                        'Receptionist 1',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -79,21 +80,14 @@ class _HomeState extends State<Home> {
                     Navigator.pushNamed(context, QString.routeExpenseList);
                   }),
               ListTile(
-                  leading: Icon(Icons.contact_phone_outlined),
-                  title: Text(QString.titleOnCallList),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, QString.routeOnCallList);
-                  }),
-              ListTile(
                   leading: Icon(Icons.login_outlined),
                   title: Text('Logout'),
                   onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
+                    // Navigator.pop(context);
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => LoginScreen()),
+                    // );
                   })
             ],
           ),
@@ -161,7 +155,7 @@ class _HomeState extends State<Home> {
                         Center(
                           child: Text(
                             'For adding data in database',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: QTextStyle.homeHeader,
                           ),
                         ),
                       ],
@@ -200,46 +194,7 @@ class _HomeState extends State<Home> {
                         Center(
                           child: Text(
                             'To view data that is present in database',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget widgetRowHeaderThere() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      textDirection: TextDirection.ltr,
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-            child: Card(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                textDirection: TextDirection.ltr,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: Text(
-                            'Receptionist Start and End Time',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: QTextStyle.homeHeader,
                           ),
                         ),
                       ],
@@ -339,7 +294,7 @@ class _HomeState extends State<Home> {
                   children: [
                     Text(
                       QString.titlePatientList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: QTextStyle.homeItem,
                     ),
                   ],
                 ),
@@ -379,7 +334,7 @@ class _HomeState extends State<Home> {
                   children: [
                     Text(
                       QString.titleAppointmentList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: QTextStyle.homeItem,
                     ),
                   ],
                 ),
@@ -395,8 +350,7 @@ class _HomeState extends State<Home> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          GlobalSnackbar.showMessageUsingSnackBar(
-              Colors.greenAccent, 'working on it', context);
+          Navigator.pushNamed(context, QString.routeInvoiceList);
         },
         child: Card(
           child: Column(
@@ -420,7 +374,7 @@ class _HomeState extends State<Home> {
                   children: [
                     Text(
                       QString.titleInvoiceList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: QTextStyle.homeItem,
                     ),
                   ],
                 ),
@@ -460,7 +414,7 @@ class _HomeState extends State<Home> {
                   children: [
                     Text(
                       QString.titleExpenseList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: QTextStyle.homeItem,
                     ),
                   ],
                 ),
@@ -500,7 +454,7 @@ class _HomeState extends State<Home> {
                   children: [
                     Text(
                       QString.titleOnCallList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: QTextStyle.homeItem,
                     ),
                   ],
                 ),
@@ -540,7 +494,7 @@ class _HomeState extends State<Home> {
                   children: [
                     Text(
                       QString.titleAddPatient,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: QTextStyle.homeItem,
                     ),
                   ],
                 ),
@@ -580,7 +534,7 @@ class _HomeState extends State<Home> {
                   children: [
                     Text(
                       QString.titleAddExpense,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: QTextStyle.homeItem,
                     ),
                   ],
                 ),

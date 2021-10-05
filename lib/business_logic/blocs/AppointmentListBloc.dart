@@ -1,6 +1,6 @@
 import 'package:baby_receptionist/business_logic/common/GlobalProgressDialog.dart';
 import 'package:baby_receptionist/business_logic/common/GlobalRefreshToken.dart';
-import 'package:baby_receptionist/business_logic/common/GlobalSnakbar.dart';
+import 'package:baby_receptionist/business_logic/common/GlobalSnackbar.dart';
 import 'package:baby_receptionist/data/models/Requests/AppointmentRequest.dart';
 import 'package:baby_receptionist/data/models/Responses/AppointmentResponse.dart';
 import 'package:baby_receptionist/data/models/Sample/AppointmentSample.dart';
@@ -23,7 +23,7 @@ class AppointmentListBloc {
   final _fromDate = BehaviorSubject<String>();
   final _toDate = BehaviorSubject<String>();
 
-  Stream<List<Map<String, dynamic>>> get source => _source;
+  Stream<List<Map<String, dynamic>>> get source => _source.stream;
 
   Stream<String> get tableType => _tableType.stream;
 
@@ -32,6 +32,8 @@ class AppointmentListBloc {
   Stream<String> get fromDate => _fromDate.stream;
 
   Stream<String> get toDate => _toDate.stream;
+
+  Function(List<Map<String, dynamic>>) get changeSource => _source.sink.add;
 
   Function(String) get changeTableType => _tableType.sink.add;
 
@@ -42,12 +44,12 @@ class AppointmentListBloc {
   Function(String) get changeToDate => _toDate.sink.add;
 
   void dispose() {
-    print('appointment dispose');
     _source.close();
     _tableType.close();
     _selectDoctor.close();
     _fromDate.close();
     _toDate.close();
+    print('appointment dispose');
   }
 
   List<Map<String, dynamic>> generateDataForTable(
@@ -75,6 +77,22 @@ class AppointmentListBloc {
         "guardian": appointment.patient.guardian,
         "paymentProfile": appointment.patient.paymentProfile,
         "description": appointment.patient.description,
+        "userType": appointment.patient.user.userType,
+        "dateOfBirth": appointment.patient.user.dateOfBirth,
+        "maritalStatus": appointment.patient.user.maritalStatus,
+        "religion": appointment.patient.user.religion,
+        "firstName": appointment.patient.user.firstName,
+        "lastName": appointment.patient.user.lastName,
+        "fatherHusbandName": appointment.patient.user.fatherHusbandName,
+        "gender": appointment.patient.user.gender,
+        "cnic": appointment.patient.user.cnic,
+        "contact": appointment.patient.user.contact,
+        "emergencyContact": appointment.patient.user.emergencyContact,
+        "email": appointment.patient.user.email,
+        "address": appointment.patient.user.address,
+        "joiningDate": appointment.patient.user.joiningDate,
+        "floorNo": appointment.patient.user.floorNo,
+        "experience": appointment.patient.user.experience,
         "action": appointment.id,
       });
     }

@@ -37,4 +37,6 @@ class QError {
 
   static const String dateFrom = '"From Date" must be smaller than "To Date".';
   static const String dateTo = '"To Date" must be greater than "From Date".';
+
+  static const String procedureNotSelected = 'Error: Procedures not selected.';
 }

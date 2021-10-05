@@ -1,16 +1,15 @@
-import 'package:baby_receptionist/data/models/Requests/ExpenseRequest.dart';
 import 'package:baby_receptionist/presentation/constants/QString.dart';
-import 'package:baby_receptionist/presentation/pages/AddPatient.dart';
-import 'package:baby_receptionist/presentation/pages/EditExpense.dart';
-import 'package:baby_receptionist/presentation/pages/ExpenseList.dart';
+import 'package:baby_receptionist/presentation/pages/invoice/InvoiceList.dart';
+import 'package:baby_receptionist/presentation/pages/patient/AddPatient.dart';
+import 'package:baby_receptionist/presentation/pages/expense/EditExpense.dart';
+import 'package:baby_receptionist/presentation/pages/expense/ExpenseList.dart';
 import 'package:baby_receptionist/presentation/pages/Home.dart';
 import 'package:baby_receptionist/presentation/pages/LoginScreen.dart';
-import 'package:baby_receptionist/presentation/pages/NewExpense.dart';
-import 'package:baby_receptionist/presentation/pages/NewInvoice.dart';
-import 'package:baby_receptionist/presentation/pages/OnCallList.dart';
-import 'package:baby_receptionist/presentation/pages/PatientList.dart';
+import 'package:baby_receptionist/presentation/pages/expense/NewExpense.dart';
+import 'package:baby_receptionist/presentation/pages/invoice/NewInvoice.dart';
+import 'package:baby_receptionist/presentation/pages/patient/PatientList.dart';
 import 'package:baby_receptionist/presentation/pages/Refund.dart';
-import 'package:baby_receptionist/presentation/pages/appointment/appointment_list/AppointmentList.dart';
+import 'package:baby_receptionist/presentation/pages/appointment/AppointmentList.dart';
 import 'package:flutter/material.dart';
 
 class AppRouter {
@@ -47,21 +46,24 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => PatientList(),
         );
-      case '/NewInvoice':
+      case QString.routeNewInvoice:
+        final arguments = settings.arguments;
         return MaterialPageRoute(
-          builder: (_) => NewInvoice(),
+          builder: (_) => NewInvoice(
+            arguments: arguments,
+          ),
         );
       case '/Refund':
         return MaterialPageRoute(
           builder: (_) => Refund(),
         );
-      case '/OnCallList':
-        return MaterialPageRoute(
-          builder: (_) => OnCallList(),
-        );
       case QString.routeAppointmentList:
         return MaterialPageRoute(
           builder: (_) => AppointmentList(),
+        );
+      case QString.routeInvoiceList:
+        return MaterialPageRoute(
+          builder: (_) => InvoiceList(),
         );
       default:
         return null;

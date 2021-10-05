@@ -1,6 +1,6 @@
 import 'package:baby_receptionist/business_logic/common/GlobalProgressDialog.dart';
 import 'package:baby_receptionist/business_logic/common/GlobalRefreshToken.dart';
-import 'package:baby_receptionist/business_logic/common/GlobalSnakbar.dart';
+import 'package:baby_receptionist/business_logic/common/GlobalSnackbar.dart';
 import 'package:baby_receptionist/business_logic/validators/Validators.dart';
 import 'package:baby_receptionist/data/models/Requests/PatientRequest.dart';
 import 'package:baby_receptionist/data/models/Responses/PatientResponse.dart';
@@ -15,7 +15,7 @@ class AddPatientBloc with Validators {
 
   final _category = BehaviorSubject<String>();
   final _firstName = BehaviorSubject<String>();
-  final _lastName = BehaviorSubject<String>.seeded('seedValue');
+  final _lastName = BehaviorSubject<String>();
   final _fatherHusbandName = BehaviorSubject<String>();
   final _gender = BehaviorSubject<String>();
   final _identityCard = BehaviorSubject<String>();
@@ -116,7 +116,6 @@ class AddPatientBloc with Validators {
         floorNo,
         experience,
         patientType,
-        referredDate,
       ], (values) => values.every((element) => true));
 
   Function(String) get changeFatherHusbandName => _fatherHusbandName.sink.add;
@@ -196,6 +195,26 @@ class AddPatientBloc with Validators {
     _parentGuardian.close();
     _paymentProfile.close();
     _description.close();
+  }
+
+  void validateFields() {
+    changeCategory(_category.hasValue ? _category.value : '');
+    changeFirstName(_firstName.hasValue ? _firstName.value : '');
+    changeLastName(_lastName.hasValue ? _lastName.value : '');
+    changeFatherHusbandName(
+        _fatherHusbandName.hasValue ? _fatherHusbandName.value : '');
+    changeGender(_gender.hasValue ? _gender.value : '');
+    changeIdentityCard(_identityCard.hasValue ? _identityCard.value : '');
+    changeContactNumber(_contactNumber.hasValue ? _contactNumber.value : '');
+    changeEmergencyContactNumber(
+        _emergencyContactNumber.hasValue ? _emergencyContactNumber.value : '');
+    changeEmail(_email.hasValue ? _email.value : '');
+    changeAddress(_address.hasValue ? _address.value : '');
+    changeJoiningDate(_joiningDate.hasValue ? _joiningDate.value : '');
+    changeDateOfBirth(_dateOfBirth.hasValue ? _dateOfBirth.value : '');
+    changeFloorNo(_floorNo.hasValue ? _floorNo.value : '');
+    changeExperience(_experience.hasValue ? _experience.value : '');
+    changePatientType(_patientType.hasValue ? _patientType.value : '');
   }
 
   Future<bool> checkTokenValidity(context) async {

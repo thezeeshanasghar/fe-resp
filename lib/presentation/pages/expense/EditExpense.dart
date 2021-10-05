@@ -1,6 +1,7 @@
 import 'package:baby_receptionist/business_logic/blocs/AddExpenseBloc.dart';
-import 'package:baby_receptionist/business_logic/common/GlobalSnakbar.dart';
+import 'package:baby_receptionist/business_logic/common/GlobalSnackbar.dart';
 import 'package:baby_receptionist/business_logic/provider/TokenProvider.dart';
+import 'package:baby_receptionist/data/models/Requests/ExpenseRequest.dart';
 import 'package:baby_receptionist/presentation/constants/QColor.dart';
 import 'package:baby_receptionist/presentation/constants/QError.dart';
 import 'package:baby_receptionist/presentation/constants/QPadding.dart';
@@ -10,17 +11,37 @@ import 'package:baby_receptionist/presentation/widgets/QErrorWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class NewExpense extends StatefulWidget {
-  _NewExpenseState createState() => _NewExpenseState();
+class EditExpense extends StatefulWidget {
+  final ExpenseRequest arguments;
+
+  const EditExpense({@required this.arguments});
+
+  @override
+  _EditExpenseState createState() => _EditExpenseState();
 }
 
-class _NewExpenseState extends State<NewExpense> {
+class _EditExpenseState extends State<EditExpense> {
   final formKey = GlobalKey<FormState>();
   final bloc = AddExpenseBloc();
+  bool hasChangeDependencies = false;
+  TextEditingController tecName = TextEditingController();
+  TextEditingController tecEmployeeOrVendor = TextEditingController();
+  TextEditingController tecVoucherNo = TextEditingController();
+  TextEditingController tecTotalBill = TextEditingController();
+  TextEditingController tecTransactionDetail = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    setValues();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -34,7 +55,7 @@ class _NewExpenseState extends State<NewExpense> {
     return Scaffold(
       backgroundColor: QColor.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(QString.titleAddExpense),
+        title: Text(QString.titleEditExpense),
         centerTitle: false,
         backgroundColor: QColor.globalAppBarColor,
         elevation: 0.0,
@@ -81,6 +102,23 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
+  void setValues() {
+    tecName.text = widget.arguments.name;
+    tecEmployeeOrVendor.text = widget.arguments.employeeOrVender;
+    tecVoucherNo.text = widget.arguments.voucherNo;
+    tecTotalBill.text = widget.arguments.totalBill.toString();
+    tecTransactionDetail.text = widget.arguments.transactionDetail;
+
+    bloc.changeName(widget.arguments.name);
+    bloc.changeBillType(widget.arguments.billType);
+    bloc.changePaymentType(widget.arguments.paymentType);
+    bloc.changeEmployeeOrVendor(widget.arguments.employeeOrVender);
+    bloc.changeVoucherNo(widget.arguments.voucherNo);
+    bloc.changeCategory(widget.arguments.category);
+    bloc.changeTotalBill(widget.arguments.totalBill.toString());
+    bloc.changeTransactionDetail(widget.arguments.transactionDetail);
+  }
+
   Widget widgetName() {
     return StreamBuilder<String>(
         stream: bloc.name,
@@ -95,6 +133,7 @@ class _NewExpenseState extends State<NewExpense> {
                     QPadding.globalInputFieldBottom),
                 child: TextFormField(
                   onChanged: bloc.changeName,
+                  controller: tecName,
                   decoration: InputDecoration(
                       prefixIcon: Icon(Icons.home_repair_service_outlined),
                       errorText: snapshot.error,
@@ -139,7 +178,9 @@ class _NewExpenseState extends State<NewExpense> {
                         QPadding.globalDbffBottom),
                     child: DropdownButtonFormField<String>(
                       isExpanded: true,
-                      value: QString.dbffChooseBillType,
+                      value: widget.arguments.billType.length < 1
+                          ? QString.dbffChooseBillType
+                          : widget.arguments.billType,
                       elevation: 16,
                       decoration: InputDecoration.collapsed(
                         hintText: '',
@@ -196,7 +237,9 @@ class _NewExpenseState extends State<NewExpense> {
                         QPadding.globalDbffBottom),
                     child: DropdownButtonFormField<String>(
                       isExpanded: true,
-                      value: QString.dbffChoosePaymentType,
+                      value: widget.arguments.paymentType.length < 1
+                          ? QString.dbffChoosePaymentType
+                          : widget.arguments.paymentType,
                       elevation: 16,
                       decoration: InputDecoration.collapsed(
                         hintText: '',
@@ -239,6 +282,7 @@ class _NewExpenseState extends State<NewExpense> {
                     QPadding.globalInputFieldBottom),
                 child: TextFormField(
                   onChanged: bloc.changeEmployeeOrVendor,
+                  controller: tecEmployeeOrVendor,
                   decoration: InputDecoration(
                       prefixIcon: Icon(Icons.person_outlined),
                       errorText: snapshot.error,
@@ -266,6 +310,7 @@ class _NewExpenseState extends State<NewExpense> {
                     QPadding.globalInputFieldBottom),
                 child: TextFormField(
                   onChanged: bloc.changeVoucherNo,
+                  controller: tecVoucherNo,
                   decoration: InputDecoration(
                       prefixIcon: Icon(Icons.card_membership_outlined),
                       errorText: snapshot.error,
@@ -309,7 +354,9 @@ class _NewExpenseState extends State<NewExpense> {
                         QPadding.globalDbffBottom),
                     child: DropdownButtonFormField<String>(
                       isExpanded: true,
-                      value: QString.dbffChooseCategory,
+                      value: widget.arguments.category.length < 1
+                          ? QString.dbffChooseCategory
+                          : widget.arguments.category,
                       elevation: 16,
                       decoration: InputDecoration.collapsed(
                         hintText: '',
@@ -350,6 +397,7 @@ class _NewExpenseState extends State<NewExpense> {
                     QPadding.globalInputFieldBottom),
                 child: TextFormField(
                   onChanged: bloc.changeTotalBill,
+                  controller: tecTotalBill,
                   decoration: InputDecoration(
                       prefixIcon: Icon(Icons.money_outlined),
                       errorText: snapshot.error,
@@ -376,6 +424,7 @@ class _NewExpenseState extends State<NewExpense> {
                     QPadding.globalInputFieldBottom),
                 child: TextFormField(
                   onChanged: bloc.changeTransactionDetail,
+                  controller: tecTransactionDetail,
                   decoration: InputDecoration(
                       prefixIcon: Icon(Icons.description_outlined),
                       errorText: snapshot.error,
@@ -414,20 +463,15 @@ class _NewExpenseState extends State<NewExpense> {
                         if (snapshot.hasData) {
                           if (!snapshot.hasError) {
                             if (await bloc.checkTokenValidity(context)) {
-                              if (await bloc.onInsertExpense(
-                                  context,
-                                  context
+                              if (await bloc.onUpdateExpense(
+                                  context: context,
+                                  token: context
                                       .read<TokenProvider>()
                                       .tokenSample
                                       .jwtToken,
-                                  context
-                                      .read<TokenProvider>()
-                                      .loginSample
-                                      .userId)) {
-                                formKey.currentState.reset();
+                                  id: widget.arguments.id,
+                                  userId: widget.arguments.userId)) {
                                 Navigator.pop(context);
-                                Navigator.pushNamed(
-                                    context, QString.routeExpenseList);
                               }
                             }
                             return;

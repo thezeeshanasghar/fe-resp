@@ -1,6 +1,6 @@
 import 'package:baby_receptionist/business_logic/common/GlobalProgressDialog.dart';
 import 'package:baby_receptionist/business_logic/common/GlobalRefreshToken.dart';
-import 'package:baby_receptionist/business_logic/common/GlobalSnakbar.dart';
+import 'package:baby_receptionist/business_logic/common/GlobalSnackbar.dart';
 import 'package:baby_receptionist/business_logic/validators/Validators.dart';
 import 'package:baby_receptionist/data/models/Requests/ExpenseRequest.dart';
 import 'package:baby_receptionist/data/models/Responses/ExpenseResponse.dart';

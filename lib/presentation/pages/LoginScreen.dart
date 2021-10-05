@@ -1,4 +1,5 @@
-import 'package:baby_receptionist/business_logic/common/GlobalSnakbar.dart';
+import 'package:baby_receptionist/business_logic/common/GlobalProgressDialog.dart';
+import 'package:baby_receptionist/business_logic/common/GlobalSnackbar.dart';
 import 'package:baby_receptionist/business_logic/provider/LoginCredentialsProvider.dart';
 import 'package:baby_receptionist/business_logic/provider/TokenProvider.dart';
 import 'package:baby_receptionist/data/models/Requests/AuthenticateRequest.dart';
@@ -9,6 +10,7 @@ import 'package:baby_receptionist/presentation/constants/QPadding.dart';
 import 'package:baby_receptionist/presentation/constants/QString.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -175,6 +177,10 @@ class _LoginState extends State<LoginScreen> {
     // Navigator.pop(context);
     // Navigator.pushNamed(context, '/Home');
 
+    GlobalProgressDialog dialog = GlobalProgressDialog(context);
+    dialog.showSimpleFontellicoProgressDialog(false, QString.dialogLoading,
+        SimpleFontelicoProgressDialogType.hurricane);
+
     AuthenticationService authenticationService = AuthenticationService();
     AuthenticateResponse authenticateResponse =
         await authenticationService.authenticateLogin(AuthenticateLoginRequest(
@@ -186,6 +192,7 @@ class _LoginState extends State<LoginScreen> {
         context.read<LoginCredentialsProvider>().setLoginCredentials(
             AuthenticateLoginRequest(
                 UserName: 'basit@gmail.com', Password: 'basit'));
+        dialog.hideSimpleFontellicoProgressDialog();
         Navigator.pop(context);
         Navigator.pushNamed(context, '/Home');
       } else {
@@ -196,5 +203,6 @@ class _LoginState extends State<LoginScreen> {
       GlobalSnackbar.showMessageUsingSnackBar(
           QColor.snackGlobalFailed, 'Failed', context);
     }
+    dialog.hideSimpleFontellicoProgressDialog();
   }
 }

@@ -39,6 +39,7 @@ dependencies:
   timer_count_down: ^2.1.0+1
   flutter_bloc: ^7.1.0
   rxdart: ^0.27.1
+  responsive_grid: ^2.0.0
 
 dev_dependencies:
   flutter_test:

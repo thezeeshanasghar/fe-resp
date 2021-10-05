@@ -1,5 +1,3 @@
-
-
 import 'package:baby_receptionist/data/models/Sample/PatientSample.dart';
 
 class PatientResponse {
@@ -17,7 +15,8 @@ class PatientResponse {
     return PatientResponse(
         isSuccess: json['isSuccess'],
         message: json['message'],
-        data: json['data'] != null ? PatientSample.fromJson(json['data']) : null);
+        data:
+            json['data'] != null ? PatientSample.fromJson(json['data']) : null);
   }
 }
 
@@ -38,6 +37,7 @@ class PatientResponseList {
       var list = json['data'] as List;
       dataList = list.map((i) => PatientSample.fromJson(i)).toList();
     }
-    return PatientResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
+    return PatientResponseList(
+        isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

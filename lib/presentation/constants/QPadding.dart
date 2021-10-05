@@ -49,4 +49,8 @@ class QPadding {
       EdgeInsets.fromLTRB(10, 1, 10, 1);
 
   static const EdgeInsets tableHeaders = EdgeInsets.fromLTRB(5, 10, 5, 10);
+  static const EdgeInsets tableMargins = EdgeInsets.fromLTRB(10, 5, 10, 5);
+  static const BoxConstraints tableConstraints = BoxConstraints(
+    maxHeight: 500,
+  );
 }
