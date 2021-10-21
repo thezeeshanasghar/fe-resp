@@ -5,6 +5,7 @@ import 'package:baby_receptionist/data/models/Arguments/InvoiceArguments.dart';
 import 'package:baby_receptionist/data/models/Sample/DoctorSample.dart';
 import 'package:baby_receptionist/data/models/Sample/ProcedureSample.dart';
 import 'package:baby_receptionist/presentation/constants/QColor.dart';
+import 'package:baby_receptionist/presentation/constants/QPadding.dart';
 import 'package:baby_receptionist/presentation/constants/QString.dart';
 import 'package:baby_receptionist/presentation/widgets/QErrorWidget.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class _NewInvoiceState extends State<NewInvoice> {
     super.initState();
     bloc.changeDoctorTypeText(QString.txtDoctorType);
     bloc.changeInvoiceType('Consultation');
+    bloc.changeProcedureType('room');
   }
 
   @override
@@ -72,6 +74,7 @@ class _NewInvoiceState extends State<NewInvoice> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               widgetProcedureType(),
+              widgetProcedureTypeWalkin(),
               Row(
                 children: [
                   Expanded(child: widgetPreviousDate()),
@@ -618,6 +621,76 @@ class _NewInvoiceState extends State<NewInvoice> {
                       : CircularProgressIndicator();
                 })),
       ),
+    );
+  }
+
+  Widget widgetProcedureTypeWalkin() {
+    return StreamBuilder<String>(
+      stream: bloc.procedureType,
+      builder: (context, snapshot) {
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(
+                    color: !snapshot.hasError
+                        ? QColor.globalNormalInputBorder
+                        : QColor.globalErrorInputBorder,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 1,
+                                child: Text(
+                                  'Place',
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: RadioListTile(
+                                  title: const Text('Room'),
+                                  value: "Room",
+                                  groupValue: snapshot.data,
+                                  onChanged: bloc.changeProcedureType,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: RadioListTile(
+                                  title: const Text('Emergency'),
+                                  value: "Emergency",
+                                  groupValue: snapshot.data,
+                                  onChanged: bloc.changeProcedureType,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (snapshot.hasError) QErrorWidget(error: snapshot.error),
+            ],
+          ),
+        );
+      },
     );
   }
 

@@ -59,10 +59,10 @@ class InvoiceSample {
       doctorSample:
           json['doctor'] != null ? DoctorSample.fromJson(json['doctor']) : null,
       patientSample: json['patient'] != null
-          ? new PatientSample.fromJson(json['patient'])
+          ? PatientSample.fromJson(json['patient'])
           : null,
       receiptSample: json['receipt'] != null
-          ? new ReceiptSample.fromJson(json['receipt'])
+          ? ReceiptSample.fromJson(json['receipt'])
           : null,
     );
   }

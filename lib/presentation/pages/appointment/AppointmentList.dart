@@ -75,9 +75,7 @@ class _AppointmentListState extends State<AppointmentList> {
                         _TableType(
                           bloc: bloc,
                         ),
-                        SizedBox(
-                          height: QPadding.tableTypeAndTableDifference,
-                        ),
+                        SizedBox(height: QPadding.tableTypeAndTableDifference),
                         StreamBuilder<String>(
                             stream: bloc.tableType,
                             builder: (context, snapshot) {

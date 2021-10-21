@@ -20,31 +20,36 @@ class AddInvoiceRequest {
   String appointmentConsultationDate;
   String appointmentType;
   String appointmentPatientCategory;
+  bool appointmentDetailsHasDischarged;
+  String appointmentDetailsWalkinType;
   List<ProcedureList> procedureList;
 
-  AddInvoiceRequest(
-      {this.id,
-      this.doctorId,
-      this.patientId,
-      this.receptionistId,
-      this.appointmentId,
-      this.invoiceDate,
-      this.invoiceCheckupType,
-      this.invoiceCheckupFee,
-      this.invoicePaymentType,
-      this.invoiceDisposibles,
-      this.invoiceGrossAmount,
-      this.receiptPmid,
-      this.receiptDiscount,
-      this.receiptTotalAmount,
-      this.receiptPendingAmount,
-      this.receiptPaidAmount,
-      this.appointmentCode,
-      this.appointmentDate,
-      this.appointmentConsultationDate,
-      this.appointmentType,
-      this.appointmentPatientCategory,
-      this.procedureList});
+  AddInvoiceRequest({
+    this.id,
+    this.doctorId,
+    this.patientId,
+    this.receptionistId,
+    this.appointmentId,
+    this.invoiceDate,
+    this.invoiceCheckupType,
+    this.invoiceCheckupFee,
+    this.invoicePaymentType,
+    this.invoiceDisposibles,
+    this.invoiceGrossAmount,
+    this.receiptPmid,
+    this.receiptDiscount,
+    this.receiptTotalAmount,
+    this.receiptPendingAmount,
+    this.receiptPaidAmount,
+    this.appointmentCode,
+    this.appointmentDate,
+    this.appointmentConsultationDate,
+    this.appointmentType,
+    this.appointmentPatientCategory,
+    this.appointmentDetailsHasDischarged,
+    this.appointmentDetailsWalkinType,
+    this.procedureList,
+  });
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -69,6 +74,9 @@ class AddInvoiceRequest {
     data['AppointmentConsultationDate'] = this.appointmentConsultationDate;
     data['AppointmentType'] = this.appointmentType;
     data['AppointmentPatientCategory'] = this.appointmentPatientCategory;
+    data['AppointmentDetailsHasDischarged'] =
+        this.appointmentDetailsHasDischarged;
+    data['AppointmentDetailsWalkinType'] = this.appointmentDetailsWalkinType;
     if (this.procedureList != null) {
       data['ProcedureList'] =
           this.procedureList.map((v) => v.toJson()).toList();

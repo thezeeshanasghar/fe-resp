@@ -595,75 +595,76 @@ class _AddPatientState extends State<AddPatient> {
 
   Widget widgetPatientType() {
     return StreamBuilder<String>(
-        stream: bloc.patientType,
-        builder: (context, snapshot) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(
-                QPadding.globalRadioButtonLeft,
-                QPadding.globalRadioButtonTop,
-                QPadding.globalRadioButtonRight,
-                QPadding.globalRadioButtonBottom),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                        color: !snapshot.hasError
-                            ? QColor.globalNormalInputBorder
-                            : QColor.globalErrorInputBorder,
-                        style: BorderStyle.solid),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
-                        child: Column(
-                          children: <Widget>[
-                            Column(
-                              children: [
-                                ListTile(
-                                  title: Text(
-                                    'Patient Type',
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: RadioListTile(
-                                    title: const Text('Panel'),
-                                    value: "Panel",
-                                    groupValue: snapshot.data,
-                                    onChanged: bloc.changePatientType,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: RadioListTile(
-                                    title: const Text('Non-Panel'),
-                                    value: "Non-Panel",
-                                    groupValue: snapshot.data,
-                                    onChanged: bloc.changePatientType,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+      stream: bloc.patientType,
+      builder: (context, snapshot) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+              QPadding.globalRadioButtonLeft,
+              QPadding.globalRadioButtonTop,
+              QPadding.globalRadioButtonRight,
+              QPadding.globalRadioButtonBottom),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(
+                      color: !snapshot.hasError
+                          ? QColor.globalNormalInputBorder
+                          : QColor.globalErrorInputBorder,
+                      style: BorderStyle.solid),
                 ),
-                if (snapshot.hasError) QErrorWidget(error: snapshot.error),
-              ],
-            ),
-          );
-        });
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
+                      child: Column(
+                        children: <Widget>[
+                          Column(
+                            children: [
+                              ListTile(
+                                title: Text(
+                                  'Patient Type',
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: RadioListTile(
+                                  title: const Text('Panel'),
+                                  value: "Panel",
+                                  groupValue: snapshot.data,
+                                  onChanged: bloc.changePatientType,
+                                ),
+                              ),
+                              Expanded(
+                                child: RadioListTile(
+                                  title: const Text('Non-Panel'),
+                                  value: "Non-Panel",
+                                  groupValue: snapshot.data,
+                                  onChanged: bloc.changePatientType,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (snapshot.hasError) QErrorWidget(error: snapshot.error),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget widgetStatus() {

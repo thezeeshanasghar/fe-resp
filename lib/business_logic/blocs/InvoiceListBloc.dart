@@ -42,9 +42,9 @@ class InvoiceListBloc {
 
   List<Map<String, dynamic>> generateDataForTable(
       List<InvoiceSample> listOfInvoices) {
-    List<Map<String, dynamic>> tempExpense = [];
+    List<Map<String, dynamic>> temp = [];
     for (InvoiceSample invoice in listOfInvoices) {
-      tempExpense.add({
+      temp.add({
         "id": invoice.id,
         "appointmentId": invoice.appointmentId,
         "patientId": invoice.patientId,
@@ -72,7 +72,7 @@ class InvoiceListBloc {
         "patientEmergencyContact": invoice.patientSample.user.emergencyContact,
       });
     }
-    return tempExpense;
+    return temp;
   }
 
   Future<bool> checkTokenValidity(

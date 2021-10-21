@@ -40,6 +40,7 @@ class NewInvoiceBloc with Validators {
   final _netTotal = BehaviorSubject<String>();
   final _disposible = BehaviorSubject<String>();
   final _grossTotal = BehaviorSubject<String>();
+  final _procedureType = BehaviorSubject<String>();
 
   Stream<List<DoctorSample>> get doctorList => _doctorList.stream;
 
@@ -71,15 +72,21 @@ class NewInvoiceBloc with Validators {
   Stream<String> get grossTotal =>
       _grossTotal.stream.transform(globalIntValidator);
 
-  Stream<bool> get isFormValid => Rx.combineLatest([
-        ddbDoctor,
-        paymentType,
-        totalAmount,
-        discount,
-        netTotal,
-        disposible,
-        grossTotal,
-      ], (values) => values.every((element) => true));
+  Stream<String> get procedureType =>
+      _procedureType.stream.transform(globalStringValidator);
+
+  Stream<bool> get isFormValid => Rx.combineLatest(
+        [
+          ddbDoctor,
+          paymentType,
+          totalAmount,
+          discount,
+          netTotal,
+          disposible,
+          grossTotal,
+        ],
+        (values) => values.every((element) => true),
+      );
 
   Function(List<ProcedureSample>) get changeProcedureList =>
       _procedureList.sink.add;
@@ -106,6 +113,8 @@ class NewInvoiceBloc with Validators {
 
   Function(String) get changeGrossTotal => _grossTotal.sink.add;
 
+  Function(String) get changeProcedureType => _procedureType.sink.add;
+
   void dispose() {
     _doctorList.close();
     _procedureList.close();
@@ -120,6 +129,8 @@ class NewInvoiceBloc with Validators {
     _netTotal.close();
     _disposible.close();
     _grossTotal.close();
+    _procedureType.close();
+    print('new invoice bloc');
   }
 
   Future<bool> checkTokenValidity(
@@ -309,6 +320,8 @@ class NewInvoiceBloc with Validators {
       appointmentDate: invoiceArguments.appointmentDate,
       appointmentPatientCategory: invoiceArguments.appointmentPatientCategory,
       appointmentType: invoiceArguments.appointmentType,
+      appointmentDetailsHasDischarged: false,
+      appointmentDetailsWalkinType: _procedureType.value,
     );
   }
 }
