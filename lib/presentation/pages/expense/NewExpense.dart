@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 
 import '../../constants/QColor.dart';
 import '../../constants/QPadding.dart';
