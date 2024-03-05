@@ -1,0 +1,575 @@
+
+import 'package:flutter/material.dart';
+
+import '../constants/QColor.dart';
+
+class Refund extends StatefulWidget {
+  @override
+  _RefundState createState() => _RefundState();
+}
+
+class _RefundState extends State<Refund> {
+  @override
+  Widget build(BuildContext context) {
+    final double shortestSide = MediaQuery.of(context)
+        .size
+        .shortestSide; // get the shortest side of device
+    final bool useMobileLayout = shortestSide < 650.0; // check for tablet
+    final Orientation orientation =
+        MediaQuery.of(context).orientation; // get the orientation
+
+    return Scaffold(
+        backgroundColor: QColor.globalBackgroundColor,
+        appBar: AppBar(
+          title: Text("Add Refund"),
+          centerTitle: false,
+          backgroundColor: QColor.globalAppBarColor,
+          elevation: 0.0,
+        ),
+        body: gridviewForPhone());
+  }
+}
+
+gridviewForPhone() {
+  return Padding(
+    padding: EdgeInsets.all(5.0),
+    child: GridView.count(
+      crossAxisCount: 1,
+      childAspectRatio: 1.0,
+      mainAxisSpacing: 4.0,
+      crossAxisSpacing: 4.0,
+      children: [RefundForm()],
+    ),
+  );
+}
+
+class RefundForm extends StatefulWidget {
+  @override
+  _RefundFormState createState() => _RefundFormState();
+}
+
+class _RefundFormState extends State<RefundForm> {
+  @override
+  final RefundFormKey = GlobalKey<FormState>();
+  final DateFromController = TextEditingController();
+  final DateToController = TextEditingController();
+  final DateController = TextEditingController();
+  DateTime? DateFrom;
+  DateTime? DateTo;
+  String? RefundType;
+  int ?UserId;
+  double ?Charges;
+  DateTime ?AppointmentDate;
+  String ?FirstName;
+  String ?LastName;
+  String? Doctor;
+  String ?AppointmentType;
+  DateTime? Date;
+
+  Widget build(BuildContext context) {
+    return Container(child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints viewportConstraints) {
+      return Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.30,
+                  child: widgetDateFrom()),
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.30,
+                  child: widgetDateTo()),
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.30,
+                  child: widgetRefundType()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.47,
+                  child: widgetUserId()),
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.47,
+                  child: widgetAmount()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.47,
+                  child: widgetFirstName()),
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.47,
+                  child: widgetLastName()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.97,
+                  child: widgetDate()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.47,
+                  child: widgetDoctor()),
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.47,
+                  child: widgetAppointmentType()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.97,
+                  child: widgetSubmit()),
+            ],
+          )
+        ],
+      );
+    }));
+  }
+
+  Widget widgetDateFrom() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            controller: DateFromController,
+            decoration: InputDecoration(
+              icon: Icon(Icons.date_range),
+              border: OutlineInputBorder(),
+              labelText: 'Date From',
+            ),
+            validator: ( value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+            },
+            onSaved: ( value) {
+              DateFrom = DateTime.parse(value!);
+            },
+            onTap: () {
+              pickDateFrom();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  pickDateFrom() async {
+    DateTime? date = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(DateTime.now().year + 1));
+    if (date != null) {
+      setState(() {
+        DateFrom = date;
+        DateFromController.text = DateFrom.toString();
+      });
+    }
+  }
+
+  Widget widgetRefundType() {
+    return Row(children: [
+      Expanded(
+          child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: Colors.grey)),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    value: RefundType,
+                    elevation: 16,
+                    underline: Container(
+                      height: 0,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: ( newValue) {
+                      setState(() {
+                        RefundType = newValue;
+                      });
+                    },
+                    items: <String>['Select Type', 'Payment', 'Return']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+    ]);
+  }
+
+  Widget widgetDateTo() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            controller: DateToController,
+            decoration: InputDecoration(
+              icon: Icon(Icons.date_range),
+              border: OutlineInputBorder(),
+              labelText: 'Date To',
+            ),
+            validator: ( value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+            },
+            onSaved: ( value) {
+              DateTo = DateTime.parse(value!);
+            },
+            onTap: () {
+              pickDateTo();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  pickDateTo() async {
+    DateTime? date = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(DateTime.now().year + 1));
+    if (date != null) {
+      setState(() {
+        DateTo = date;
+        DateToController.text = DateFrom.toString();
+      });
+    }
+  }
+
+  Widget widgetDate() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            controller: DateController,
+            decoration: InputDecoration(
+              icon: Icon(Icons.date_range),
+              border: OutlineInputBorder(),
+              labelText: 'Date',
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+            },
+            onSaved: ( value) {
+              Date = DateTime.parse(value!);
+            },
+            onTap: () {
+              pickDate();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  pickDate() async {
+    DateTime? date = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(DateTime.now().year + 1));
+    if (date != null) {
+      setState(() {
+        Date = date;
+        DateController.text = DateFrom.toString();
+      });
+    }
+  }
+
+  Widget widgetUserId() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            autofocus: false,
+            maxLength: 4,
+            decoration: InputDecoration(
+                icon: Icon(Icons.verified_user),
+                border: OutlineInputBorder(),
+                labelText: 'User Id'),
+            validator: ( value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: ( value) {
+              UserId = int.parse(value!);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetAmount() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            autofocus: false,
+            maxLength: 4,
+            decoration: InputDecoration(
+                icon: Icon(Icons.monetization_on),
+                border: OutlineInputBorder(),
+                labelText: 'Amount'),
+            validator: ( value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: ( value) {
+              Charges = double.parse(value!);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetFirstName() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            autofocus: false,
+            maxLength: 4,
+            decoration: InputDecoration(
+                icon: Icon(Icons.verified_user),
+                border: OutlineInputBorder(),
+                labelText: 'First Name'),
+            validator: ( value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: ( value) {
+              FirstName = value;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetLastName() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            autofocus: false,
+            maxLength: 4,
+            decoration: InputDecoration(
+                icon: Icon(Icons.verified_user),
+                border: OutlineInputBorder(),
+                labelText: 'Last Name'),
+            validator: ( value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: ( value) {
+              LastName = value;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetDoctor() {
+    return Row(children: [
+      Expanded(
+          child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Column(
+              children: [
+                Text(
+                  'Doctor',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: Colors.grey)),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    value: Doctor,
+                    elevation: 16,
+                    underline: Container(
+                      height: 0,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: ( newValue) {
+                      setState(() {
+                        Doctor = newValue;
+                      });
+                    },
+                    items: <String>[
+                      'Select Doctor',
+                      'Dr. Salman',
+                      'Dr. Faisal',
+                      'Dr. Nawaz',
+                      'Dr. Sadia'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+    ]);
+  }
+
+  Widget widgetAppointmentType() {
+    return Row(children: [
+      Expanded(
+          child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Column(
+              children: [
+                Text(
+                  'Appintment Type',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: Colors.grey)),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    value: AppointmentType,
+                    elevation: 16,
+                    underline: Container(
+                      height: 0,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: ( newValue) {
+                      setState(() {
+                        AppointmentType = newValue;
+                      });
+                    },
+                    items: <String>[
+                      'Select Appointment',
+                      'Consultation',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ))
+    ]);
+  }
+
+  Widget widgetSubmit() {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: ElevatedButton(
+              autofocus: false,
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 90, vertical: 15),
+                textStyle: TextStyle(fontSize: 20),
+              ),
+              child: Text('Submit'),
+              onPressed: () {
+                if (!RefundFormKey.currentState!.validate()) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content:
+                          Text('Error: Some input fields are not filled.')));
+                  return;
+                }
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('Successfull')));
+                RefundFormKey.currentState!.save();
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
