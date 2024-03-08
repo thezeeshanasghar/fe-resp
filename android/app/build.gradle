@@ -51,8 +51,10 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
 
-        minSdkVersion 33
-
+        minSdkVersion 24
+        targetSdkVersion 33
+        versionCode 3
+        versionName '1.1'
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -77,4 +79,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation "androidx.constraintlayout:constraintlayout:2.1.3"
+}
